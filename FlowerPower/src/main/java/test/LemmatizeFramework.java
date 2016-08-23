@@ -35,7 +35,7 @@ public class LemmatizeFramework {
 		//lemma lem= new lemma();
 		//lem.init();
 		try {
-			Connection dbcon = DB.getConnection("jdbc:mysql://mysql.l3s.uni-hannover.de?characterEncoding=utf8","flickrattractive");
+			Connection dbcon = DB.getConnection("l3s","flickrattractive");
 			
 			//SELECT * FROM `conference_proceedings_paragraphs` WHERE `ckey` LIKE '%chi\\\\%' AND `txt` LIKE 'abstract%'
 			PreparedStatement pstmt1= dbcon.prepareStatement("SELECT `id`,`txt` FROM "+table+" WHERE lem_nouns=''");

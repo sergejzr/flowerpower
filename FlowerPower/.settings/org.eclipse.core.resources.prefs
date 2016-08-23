@@ -1,8 +1,8 @@
 eclipse.preferences.version=1
-encoding//main/java/src/analyze/JaccardClusterScores.java=UTF-8
-encoding//main/java/src/analyze/MALLETselectionFlickr.java=UTF-8
-encoding//main/java/src/analyze/MIselection.java=UTF-8
-encoding//main/java/src/analyze/MIselection2.java=UTF-8
-encoding//main/java/src/analyze/MIselectionFlickr.java=UTF-8
-encoding//main/java/src/analyze/MIselectionFlickrNoLabel.java=UTF-8
-encoding//main/java/src/analyze/MItest.java=UTF-8
+encoding//src/main/java/analyze/JaccardClusterScores.java=UTF-8
+encoding//src/main/java/analyze/MALLETselectionFlickr.java=UTF-8
+encoding//src/main/java/analyze/MIselection.java=UTF-8
+encoding//src/main/java/analyze/MIselection2.java=UTF-8
+encoding//src/main/java/analyze/MIselectionFlickr.java=UTF-8
+encoding//src/main/java/analyze/MIselectionFlickrNoLabel.java=UTF-8
+encoding//src/main/java/analyze/MItest.java=UTF-8
