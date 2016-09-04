@@ -1,8 +1,10 @@
 package de.l3s.nlp;
 
 import java.io.StringReader;
+import java.text.BreakIterator;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Locale;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -23,11 +25,25 @@ public class LemmatizerMaven {
 	    private final TokenizerFactory<CoreLabel> tokenizerFactory = PTBTokenizer.factory(new CoreLabelTokenFactory(), "invertible=true");
 
 	   // private final LexicalizedParser parser = LexicalizedParser.loadModel(PCG_MODEL);
+public void init()
+{
+	
+}
+	    public Tree parse(LexicalizedParser parser, String str) { 
+	    	
 
-	    public Tree parse(LexicalizedParser parser, String str) {                
+	    	
+	    	
+	    	
+	    	try{
 	        List<CoreLabel> tokens = tokenize(str);
 	        Tree tree = parser.apply(tokens);
 	        return tree;
+	    	}catch(Exception e)
+	    	{
+	    		System.out.println("problematic: "+str);
+	    	}
+	    	return null;
 	    }
 
 	    private List<CoreLabel> tokenize(String str) {
@@ -40,7 +56,14 @@ public class LemmatizerMaven {
 	    
 	public static void main(String[] args) {
 		LemmatizerMaven lm=new LemmatizerMaven();
-			System.out.println(lm.getLemma("Well fuck", "en"));
+			Vector<Lemma> lemms;
+			System.out.println(lemms=lm.getLemma("o I masturbated in class yesterday Yea imma nut on it and feed it to your mother  Don't get fucked up disrespecting my mother like that.. Better feed it to your father.. Oh wait you don't know who that it.. Suck my dick bitch Lol yo mad can't even spell right you in college right? Neither or can you  Que?", "en"));
+
+	for(Lemma l:lemms)
+	{
+		System.out.print(l.getLem()+"("+l.getTag()+")");
+	}
+	
 	}
 	public Vector<Lemma> getLemma(String s, String lang) {
 		
@@ -64,26 +87,35 @@ public class LemmatizerMaven {
 		return parseWith("edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz",text);
 	}
 
-	Hashtable<String, LexicalizedParser> models=new Hashtable<String, LexicalizedParser>();
+	 Hashtable<String, LexicalizedParser> models=new Hashtable<String, LexicalizedParser>();
+	
 	private  Vector<Lemma> parseWith(String model, String text) {
 		Vector<Lemma> ret=new Vector<Lemma>();
 		if(text.trim().length()==0) return ret;
-		LexicalizedParser mt=models.get(model);
-		if(mt==null)
-		{
-			models.put(model, mt=LexicalizedParser.loadModel(model));
-		}
+		LexicalizedParser mt=loadParser(model);
+		 StringBuilder sb=new StringBuilder();
+    	BreakIterator iterator = BreakIterator.getSentenceInstance(Locale.US);
+    	String source = text+"";
+    	iterator.setText(source);
+    	int start = iterator.first();
+    	for (int end = iterator.next();
+    	    end != BreakIterator.DONE;
+    	    start = end, end = iterator.next()) {
+    	  text=source.substring(start,end);
+    	
+		
 		
 		 Tree tree = parse(mt,text);  
 
 	        List<Tree> leaves = tree.getLeaves();
-	       StringBuilder sb=new StringBuilder();
+	      
 	        for (Tree leaf : leaves) { 
 	            Tree parent = leaf.parent(tree);
 	           sb.append(leaf.label().value() + "_" + parent.label().value() + " ");
 	        }
 	        
-		
+    	}
+    	
 		String output = sb.toString();
 		Morphology m=new Morphology();
 		String patternCapitalCaption = "(\\p{L}+)_([A-Za-z]+)";
@@ -100,6 +132,16 @@ public class LemmatizerMaven {
 		}
 		
 		return ret;
+	}
+
+	public  synchronized LexicalizedParser loadParser(String model) {
+		LexicalizedParser mt = models.get(model);
+	if(mt==null)
+	{
+		models.put(model, mt=LexicalizedParser.loadModel(model));
+	}
+	return mt;
+	
 	}
 	
 }

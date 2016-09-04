@@ -21,7 +21,7 @@ import de.l3s.lemma.lemma;
 import de.l3s.nlp.Lemma;
 import de.l3s.nlp.LemmatizerMaven;
 
-public class LemmatizeFramework {
+public class StemmerFramework {
 	
 	public String table;
 	public String getTable() {
@@ -30,7 +30,7 @@ public class LemmatizeFramework {
 	public void setTable(String table) {
 		this.table = table;
 	}
-	public  void lemmatizeParallel(String langtoken,int numthreads, String[] poss)
+	public  void lemmatizeParallel(String langtoken,int numthreads)
 	{
 		//lemma lem= new lemma();
 		//lem.init();
@@ -52,7 +52,7 @@ public class LemmatizeFramework {
 	    	    
 		        Hashtable<Integer, String> origidx=new Hashtable<Integer, String>();
 		        Stack<Integer> towork=new Stack<Integer>();
-		        List<LemmatizeThread> myworkers=new ArrayList<LemmatizeThread>();
+		        List<StemmThread> myworkers=new ArrayList<StemmThread>();
 		        
 	        	PreparedStatement pstmt1= dbcon.prepareStatement("SELECT `id`,`txt` FROM "+table+"  LIMIT "+limit+",10000");	
 	        	ResultSet rs = pstmt1.executeQuery();
@@ -69,8 +69,8 @@ public class LemmatizeFramework {
 	      
 	        for(int i=0;i<numthreads;i++)
 	        {
-	        	LemmatizeThread t;
-				executor.execute(t=new LemmatizeThread(origidx,towork,langtoken,poss));
+	        	StemmThread t;
+				executor.execute(t=new StemmThread(origidx,towork,langtoken));
 				myworkers.add(t);
 	        }
 	       
@@ -82,7 +82,7 @@ public class LemmatizeFramework {
 				e.printStackTrace();
 			}
 	
-	        for(LemmatizeThread t:myworkers)
+	        for(StemmThread t:myworkers)
 	        {
 	        	Hashtable<Integer, String> lemmatizedidx = t.getLemmatizedidx();
 	        	 for(Integer task:lemmatizedidx.keySet()){
@@ -260,18 +260,18 @@ public class LemmatizeFramework {
 		return new String(sb).trim();
 		
 	}
-	public LemmatizeFramework(String table) {
+	public StemmerFramework(String table) {
 		this.table=table;
 	}
 	public static void main(String[] args) {
 		
-		if(args.length<3)
+		if(args.length<2)
 		{
-			System.out.println("use with arguments : java -jar LemmatizeFramework database_table language N,V,A");
+			System.out.println("use with arguments : java -jar StemmerFramework database_table language ");
 			return;
 		}
 			String lang=args[1];
-			String poss[]=args[2].split(",");
+			
 			
 		try {
 			Thread.sleep(1000);
@@ -280,7 +280,7 @@ public class LemmatizeFramework {
 			e.printStackTrace();
 		}
 		
-		LemmatizeFramework ld= new LemmatizeFramework(
+		StemmerFramework ld= new StemmerFramework(
 				//"flower_fulltext_sections_auto5000"
 			//	"flower_fulltext_auto5000"
 				//"flower_werft"
@@ -290,7 +290,7 @@ public class LemmatizeFramework {
 				args[0]
 				);
 		
-		ld.lemmatizeParallel(lang,20, poss);
+		ld.lemmatizeParallel(lang,20);
 	}
 
 }

@@ -513,7 +513,7 @@ public class FlowerPower {
 			Connection dbcon = this.con;
 			if (this.con == null) {
 				Class.forName("com.mysql.jdbc.Driver");
-				this.con = 	 dbcon = DB.getConnection("jdbc:mysql://mysql.l3s.uni-hannover.de?characterEncoding=utf8","flickrattractive");
+				this.con = 	 dbcon = DB.getConnection("l3s","flickrattractive");
 				
 			}
 			PreparedStatement pstmt = dbcon.prepareStatement("SELECT * FROM `" + dataset + "` WHERE 1");
