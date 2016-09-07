@@ -157,7 +157,7 @@ public static void main(String[] args) {
 		{
 			pool.execute(new FlowerThread(new File(args[3]),new File(args[4]), 
 					//"flower_cropped_auto5000_joint"
-					model_table,flower_table,i,3, 2000, OrderStrategy.naturalOrdering
+					model_table,flower_table,i,3, 2000, ordering
 					));
 		}
 	
