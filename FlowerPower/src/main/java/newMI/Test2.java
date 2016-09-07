@@ -44,7 +44,7 @@ import cc.mallet.types.IDSorter;
 import cc.mallet.types.Instance;
 import cc.mallet.types.InstanceList;
 import de.l3s.db.DB;
-import l3s.rdj.Document;
+import l3s.rdj.document.Document;
 import l3s.toolbox.JaccardSimilarityComparator;
 
 

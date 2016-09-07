@@ -43,8 +43,7 @@ import cc.mallet.types.InstanceList;
 //import oracle.jdbc.driver.*;
 //import oracle.sql.*;
 import de.l3s.db.DB;
-import l3s.rdj.Diversity;
-import l3s.rdj.Document;
+import l3s.rdj.document.Document;
 import l3s.rdj.impl.AllPairsDJ;
 import l3s.toolbox.JaccardSimilarityComparator;
 
@@ -968,7 +967,7 @@ public class MIselectionFlickr {
 		    		   	collection= new Vector<Document>();
 		    		   	collection.add(d);
 		    		   	collection.add(t);
-						Diversity dj1 = new AllPairsDJ(collection, error, confidentiality,similarityComparator);
+		    		   	AllPairsDJ dj1 = new AllPairsDJ(collection, error, confidentiality,similarityComparator);
 						System.out.println("RDJ "+i.toString()+"-"+j.toString()+":" + dj1.getRDJ());
 						MIselection mi = new MIselection(positiveList, negativeList);
 						System.out.println("positive list:"+positiveList.size()); 

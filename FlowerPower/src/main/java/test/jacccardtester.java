@@ -10,8 +10,8 @@ import java.util.Vector;
 import cc.mallet.topics.ParallelTopicModel;
 import cc.mallet.types.Alphabet;
 import cc.mallet.types.IDSorter;
-import l3s.rdj.Diversity;
-import l3s.rdj.Document;
+import l3s.rdj.document.Diversity;
+import l3s.rdj.document.Document;
 import l3s.rdj.impl.AllPairsDJ;
 import l3s.toolbox.JaccardSimilarityComparator;
 

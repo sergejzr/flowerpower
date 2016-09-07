@@ -6,8 +6,7 @@ import java.util.Arrays;
 import java.util.Random;
 import java.util.Vector;
 
-import l3s.rdj.Diversity;
-import l3s.rdj.Document;
+import l3s.rdj.document.Document;
 import l3s.rdj.impl.AllPairsDJ;
 import l3s.rdj.impl.SampleDJ;
 import l3s.rdj.impl.TrackDJ;
@@ -25,14 +24,14 @@ public class DiversityExample {
 		
 		JaccardSimilarityComparator similarityComparator = new JaccardSimilarityComparator();
 		
-		Diversity dj1 = new AllPairsDJ(collection, error, confidentiality,similarityComparator);
+		 AllPairsDJ dj1 = new AllPairsDJ(collection, error, confidentiality,similarityComparator);
 		System.out.println("RDJ:" + dj1.getRDJ());
 
-		Diversity dj2 = new SampleDJ(collection, error, confidentiality,similarityComparator);
+		 SampleDJ dj2 = new SampleDJ(collection, error, confidentiality,similarityComparator);
 		System.out.println("RDJ:" + dj2.getRDJ());
 
 		//TracjDJ works only with Jaccard similarity measure.
-		Diversity dj3 = new TrackDJ(collection, confidentiality, confidentiality);
+		 TrackDJ dj3 = new TrackDJ(collection, confidentiality, confidentiality);
 		System.out.println("RDJ:" + dj3.getRDJ());
 
 	}

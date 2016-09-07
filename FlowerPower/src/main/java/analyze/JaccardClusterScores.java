@@ -19,8 +19,7 @@ import java.util.Vector;
 import cc.mallet.topics.ParallelTopicModel;
 import cc.mallet.types.Alphabet;
 import cc.mallet.types.IDSorter;
-import l3s.rdj.Diversity;
-import l3s.rdj.Document;
+import l3s.rdj.document.Document;
 import l3s.rdj.impl.AllPairsDJ;
 import l3s.toolbox.JaccardSimilarityComparator;
 
@@ -651,7 +650,7 @@ public class JaccardClusterScores {
 					
 			
 			    	JaccardSimilarityComparator similarityComparator = new JaccardSimilarityComparator();
-					Diversity dj1 = new AllPairsDJ(collection, error, confidentiality,similarityComparator);
+			    	AllPairsDJ dj1 = new AllPairsDJ(collection, error, confidentiality,similarityComparator);
 				//	System.out.println("RDJ:" + dj1.getRDJ());
 					System.out.println(i+"\t" + (""+dj1.getRDJ()).replaceAll("\\.", ","));
 //		

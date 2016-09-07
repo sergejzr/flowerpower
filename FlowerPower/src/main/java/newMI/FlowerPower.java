@@ -44,8 +44,7 @@ import de.l3s.flower.TermLink;
 import de.l3s.flower.Topic;
 import de.l3s.flower.TopicLink;
 import de.l3s.lemma.lemma;
-import l3s.rdj.Diversity;
-import l3s.rdj.Document;
+import l3s.rdj.document.Document;
 import l3s.rdj.impl.AllPairsDJ;
 import l3s.toolbox.JaccardSimilarityComparator;
 import test.DiagramInput;
@@ -982,7 +981,7 @@ public class FlowerPower {
 
 		JaccardSimilarityComparator similarityComparator = new JaccardSimilarityComparator();
 
-		Diversity dj1 = new AllPairsDJ(collection, error, confidentiality, similarityComparator);
+		 AllPairsDJ dj1 = new AllPairsDJ(collection, error, confidentiality, similarityComparator);
 		System.out.println("RDJ:" + dj1.getRDJ());
 
 		// Diversity dj2 = new SampleDJ(collection, error,
@@ -1016,7 +1015,7 @@ public class FlowerPower {
 
 		JaccardSimilarityComparator similarityComparator = new JaccardSimilarityComparator();
 
-		Diversity dj1 = new AllPairsDJ(collection, error, confidentiality, similarityComparator);
+		 AllPairsDJ dj1 = new AllPairsDJ(collection, error, confidentiality, similarityComparator);
 		System.out.println("RDJ:" + dj1.getRDJ());
 
 		// Diversity dj2 = new SampleDJ(collection, error,
