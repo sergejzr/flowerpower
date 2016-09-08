@@ -105,35 +105,65 @@ Date start=new Date();
 
     
     
-	String getStemmed(String text, String language) {
-        StringBuffer sb = new StringBuffer();
-        if (text!=null && text.trim().length()>0){
-            StringReader reader = new StringReader(text);
-            TokenStream result = new StandardTokenizer(Version.LUCENE_35, reader);
+	public  String getStemmed(String text, String language) {
+		
+		text=text.toLowerCase();
+		StringBuffer sb=new StringBuffer();
+		
+		for(String s:text.split("\\s+"))
+		{
+			if(sb.length()>0) sb.append(" ");
+			
+			if(s.contains("http")) continue;
+			if(s.length()<2) continue;
+			
+			
+			sb.append(s);
+		}
+		
+		text=sb.toString();
+		
+		
+		
+	     sb = new StringBuffer();
+	    if (text!=null && text.trim().length()>0){
+	        StringReader reader = new StringReader(text);
+	        TokenStream result = new StandardTokenizer(Version.LUCENE_35, reader);
 
-        	result = new StandardFilter(Version.LUCENE_35, result);
-        	result = new LowerCaseFilter(Version.LUCENE_35, result);
-        	result = new StopFilter(Version.LUCENE_35, result, EnglishAnalyzer.getDefaultStopSet());
-        	//result = new DictionaryCompoundWordTokenFilter(Version.LUCENE_35, result, EnglishAnalyzer.);
-        	result = new SnowballFilter(result, "English");
-            
-            
-            
-        	CharTermAttribute  term=result.addAttribute(CharTermAttribute.class);
-        	
+	    	result = new StandardFilter(Version.LUCENE_35, result);
+	    	result = new LowerCaseFilter(Version.LUCENE_35, result);
+	    	result = new StopFilter(Version.LUCENE_35, result, EnglishAnalyzer.getDefaultStopSet());
+	    	//result = new DictionaryCompoundWordTokenFilter(Version.LUCENE_35, result, EnglishAnalyzer.);
+	    	result = new SnowballFilter(result, "English");
+	        
+	        
+	        
+	    	CharTermAttribute  term=result.addAttribute(CharTermAttribute.class);
+	    	
 
 
-            try {
-                while (result.incrementToken()){
-                    sb.append(term.toString());
-                    sb.append(" ");
-                }
-            } catch (IOException ioe){
-                System.out.println("Error: "+ioe.getMessage());
-            }
-        }
-        return sb.toString();
-    }
+	        try {
+	            while (result.incrementToken()){
+	            	String t=term.toString().replaceAll(",", "").replaceAll("'", "");
+	            	if(t.matches("\\d+")) continue;
+	            	if(t.matches("\\?+")) continue;
+	            	if(t.length()<2) continue;
+	                sb.append(t);
+	                sb.append(" ");
+	            }
+	        } catch (IOException ioe){
+	            System.out.println("Error: "+ioe.getMessage());
+	        }
+	    }
+	    String k = sb.toString().trim();
+	    
+	    if(k.contains("http"))
+	    {
+	    	int i=0;
+	    	i++;
+	    }
+	    return k;
+	}
 	
 
 	public static void main(String[] args) {

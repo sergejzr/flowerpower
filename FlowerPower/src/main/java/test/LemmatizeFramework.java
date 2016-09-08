@@ -265,7 +265,8 @@ public class LemmatizeFramework {
 	}
 	public static void main(String[] args) {
 		
-		if(args.length<3)
+		if(args.length<3)//java -cp FlowerPower-0.0.1-SNAPSHOT-jar-with-dependencies.jar test.LemmatizeFramework
+
 		{
 			System.out.println("use with arguments : java -jar LemmatizeFramework database_table language N,V,A");
 			return;

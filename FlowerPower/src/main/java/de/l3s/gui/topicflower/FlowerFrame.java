@@ -196,9 +196,9 @@ public static void main(String[] args) {
 		dir=new File("/data3/zerr/flowers");
 	}
 	if (!dir.exists()) {
-		dir = new File("/media/zerr/BA0E0E3E0E0DF3E3/similarityflowers/");
+		dir = new File("/media/zerr/BA0E0E3E0E0DF3E3/twitter_cache/");
 	}
-	File outdir= new File("/media/zerr/BA0E0E3E0E0DF3E3/similarityflowers/");
+	File outdir= new File("/media/zerr/BA0E0E3E0E0DF3E3/twitter_cache/");
 	if(!outdir.exists()){outdir.mkdirs();}
 	for(File cf:dir.listFiles()){
 		if(!cf.toString().endsWith("xml")){continue;}
