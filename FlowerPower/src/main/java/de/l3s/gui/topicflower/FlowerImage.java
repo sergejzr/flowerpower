@@ -46,6 +46,27 @@ public class FlowerImage  {
 	private Float globalrect;
 	BufferedImage bi=null;
 int shiftmargin=1000;
+private int TOPIC_GENERAL_LENGTH=5;
+private int TOPIC_GENERAL_NUMBER=5;
+private int TOPIC_CONNECTION_LENGTH=5;
+private int TOPIC_CONNECTION_NUMBER=5;
+private int TOPIC_GATEGORY_LENGTH=5;
+private int TOPIC_CATEGORY_NUMBER=8;
+
+public FlowerImage() {
+	// TODO Auto-generated constructor stub
+}
+public FlowerImage(int topicGeneralLength, int topicGeneralNumber, int topicConnectionLegth, int topicConnectionNumber, int topicCategoryLength, int topicCategoryNumber) {
+
+
+TOPIC_GENERAL_LENGTH=topicGeneralLength;
+TOPIC_GENERAL_NUMBER=topicGeneralNumber;
+TOPIC_CONNECTION_LENGTH=topicConnectionLegth;
+TOPIC_CONNECTION_NUMBER=topicConnectionNumber;
+TOPIC_GATEGORY_LENGTH=topicCategoryLength;
+TOPIC_CATEGORY_NUMBER=topicCategoryNumber;
+
+}
 
 	public void paint() {
 	
@@ -80,12 +101,12 @@ int shiftmargin=1000;
 			int cnt = 0;
 			Vector<VisualLine> lines = new Vector<VisualLine>();
 			for (TopicLink tl : ot) {
-				if (cnt > k) {
+				if (cnt > TOPIC_CATEGORY_NUMBER) {
 					break;
 				}
 				getFontSize(cnt);
 				lines.add(computeVisualLine(g, font, getFontSize(cnt),
-						flower.label(tl, 3).trim(),tl.getTid()));
+						flower.label(tl, TOPIC_GATEGORY_LENGTH).trim(),tl.getTid()));
 				cnt++;
 			}
 
@@ -96,12 +117,12 @@ int shiftmargin=1000;
 			cnt = 0;
 			Vector<VisualLine> conlines = new Vector<VisualLine>();
 			for (TopicLink tl : ot) {
-				if (cnt++ > 2) {
+				if (cnt++ >= TOPIC_CONNECTION_NUMBER) {
 					break;
 				}
 				getFontSize(cnt);
 				conlines.add(computeVisualLine(g, font, getFontSize(cnt) - 1,
-						flower.label(tl, 3).trim(),tl.getTid()));
+						flower.label(tl, TOPIC_CONNECTION_LENGTH).trim(),tl.getTid()));
 			}
 
 			vcats.add(new VisualCategory(c.getName(),lines, conlines,transparent));
@@ -110,12 +131,12 @@ int shiftmargin=1000;
 		Vector<VisualLine> genlines = new Vector<VisualLine>();
 		int cnt = 0;
 		for (TopicLink tl : flower.getGeneral().getTopic()) {
-			if (cnt++ > k) {
+			if (cnt++ > TOPIC_GENERAL_NUMBER) {
 				break;
 			}
 			getFontSize(cnt);
 			genlines.add(computeVisualLine(g, font, getFontSize(cnt) + 3,
-					flower.label(tl, 5).trim(),tl.getTid()));
+					flower.label(tl, TOPIC_GENERAL_LENGTH).trim(),tl.getTid()));
 		}
 		center = new VisualCategory("general",genlines,transparent);
 		

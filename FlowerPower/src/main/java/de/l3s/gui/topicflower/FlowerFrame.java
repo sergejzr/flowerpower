@@ -40,6 +40,7 @@ public FlowerFrame(File dir, String flowerxml) {
 	Flower flower;
 	try {
 		flower = Flower.readFlower(new File(dir,flowerxml));
+		
 		List<TopicLink> top3 = flower.getGeneral().getTopic().subList(0, 2);
 		
 		int numWords=120;

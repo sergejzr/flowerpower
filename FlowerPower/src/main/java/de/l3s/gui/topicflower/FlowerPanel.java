@@ -37,8 +37,9 @@ import sl.shapes.RegularPolygon;
 
 public class FlowerPanel extends JPanel {
 
+	private int CONNECTED_TOPIC_LENGTH = 5;
 	private Flower flower;
-	int k = 5;
+	int GENERAL_TOPIC_NUMBER = 5;
 	Font font = null;
 	private double margin = 10;
 	Vector<VisualCategory> vcats;
@@ -48,6 +49,7 @@ public class FlowerPanel extends JPanel {
 	private Float globalrect;
 	BufferedImage bi=null;
 int shiftmargin=1000;
+private int CONNECTED_TOPIC_NUMBER=1;
 
 	@Override
 	public void paint(Graphics g2) {
@@ -83,12 +85,12 @@ int shiftmargin=1000;
 			int cnt = 0;
 			Vector<VisualLine> lines = new Vector<VisualLine>();
 			for (TopicLink tl : ot) {
-				if (cnt > k) {
+				if (cnt > GENERAL_TOPIC_NUMBER) {
 					break;
 				}
 				getFontSize(cnt);
 				lines.add(computeVisualLine(g, font, getFontSize(cnt),
-						flower.label(tl, 3).trim(),tl.getTid()));
+						flower.label(tl, CONNECTED_TOPIC_LENGTH).trim(),tl.getTid()));
 				cnt++;
 			}
 
@@ -99,7 +101,7 @@ int shiftmargin=1000;
 			cnt = 0;
 			Vector<VisualLine> conlines = new Vector<VisualLine>();
 			for (TopicLink tl : ot) {
-				if (cnt++ > 2) {
+				if (cnt++ >= CONNECTED_TOPIC_NUMBER) {
 					break;
 				}
 				getFontSize(cnt);
@@ -113,7 +115,7 @@ int shiftmargin=1000;
 		Vector<VisualLine> genlines = new Vector<VisualLine>();
 		int cnt = 0;
 		for (TopicLink tl : flower.getGeneral().getTopic()) {
-			if (cnt++ > k) {
+			if (cnt++ > GENERAL_TOPIC_NUMBER) {
 				break;
 			}
 			getFontSize(cnt);
