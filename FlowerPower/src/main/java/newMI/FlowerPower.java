@@ -516,7 +516,7 @@ public class FlowerPower {
 			Connection dbcon = this.con;
 			if (this.con == null) {
 				Class.forName("com.mysql.jdbc.Driver");
-				this.con = 	 dbcon = DB.getConnection(databaselable,"mysql");
+				this.con = 	 dbcon = DB.getConnection(databaselable,null);
 				
 			}
 			PreparedStatement pstmt = dbcon.prepareStatement("SELECT * FROM " + dataset + " WHERE 1");
