@@ -18,7 +18,7 @@ public class PrintFlower {
 			FlowerPower topicFlower = new FlowerPower( "localhost", null,"flower_wikimovies_clean"
 					// "dataset_20newsgroup_full"
 					//"conference_proceedings_www_clean_new"
-					, 100,null);// "table_name",
+					, 100,1,null);// "table_name",
 																// number of topics
 
 			topicFlower.generateTopicModel();// Boolean

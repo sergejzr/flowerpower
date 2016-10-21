@@ -191,7 +191,7 @@ private void writeToPNG(File f) {
     }
 }
 public static void main(String[] args) {
-	File dir = new File("C:\\Users\\singh\\sandbox\\FlowerPower");
+	File dir = new File("/media/zerr/BA0E0E3E0E0DF3E3/floweryakcache/");
 	if (!dir.exists()) {
 		dir = new File("/data3/zerr/autoflowersvilnus");
 		dir=new File("/data3/zerr/flowers");
@@ -199,7 +199,7 @@ public static void main(String[] args) {
 	if (!dir.exists()) {
 		dir = new File("/media/zerr/BA0E0E3E0E0DF3E3/twitter_cache/");
 	}
-	File outdir= new File("/media/zerr/BA0E0E3E0E0DF3E3/twitter_cache/");
+	File outdir= new File("/media/zerr/BA0E0E3E0E0DF3E3/floweryakcache/");
 	if(!outdir.exists()){outdir.mkdirs();}
 	for(File cf:dir.listFiles()){
 		if(!cf.toString().endsWith("xml")){continue;}

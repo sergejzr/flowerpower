@@ -28,7 +28,7 @@ public class PrintNewFlower {
 			FlowerPower topicFlower = new FlowerPower("loclahost", null,"auto5000_descriptions"
 					// "dataset_20newsgroup_full"
 					//"conference_proceedings_www_clean_new"
-					, 50,null);// "table_name",
+					, 50,1,null);// "table_name",
 																// number of topics
 
 			Hashtable<Integer, Topic> topics = topicFlower.generateTopicModel();// Boolean

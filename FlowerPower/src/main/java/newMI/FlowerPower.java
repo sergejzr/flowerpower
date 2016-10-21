@@ -100,7 +100,7 @@ public class FlowerPower {
 	public static void main(String[] args) throws FlowerException {
 
 		FlowerPower topicFlower = new FlowerPower("localhost",null, "dataset_20newsgroup_full", "dataset_20newsgroup_full", 200,
-				null);
+				null,1);
 		topicFlower.generateTopicModel();
 		topicFlower.printModel();
 		topicFlower.limitDataset(400000);
@@ -188,13 +188,14 @@ public class FlowerPower {
 
 	public HashMap<String, Integer> userphotocount_map = new HashMap<String, Integer>();
 	private String databaselable;
+	private int numthreads;
 
-	public FlowerPower(String databaselable,File modelcachedir, String dataset, int numtopics, Integer nr_topics_for_instance) {
-		this(databaselable, modelcachedir, dataset, dataset, numtopics, null, nr_topics_for_instance, null);
+	public FlowerPower(String databaselable,File modelcachedir, String dataset, int numtopics, Integer nr_topics_for_instance,Integer numthreads) {
+		this(databaselable, modelcachedir, dataset, dataset, numtopics, null, nr_topics_for_instance, null,numthreads);
 	}
 
 	public FlowerPower(String databaselable, File modelcachedir, String model_dataset, String flower_dataset, int numtopics,
-			Connection con, Integer nr_topics_for_instance, Integer num_iterations) {
+			Connection con, Integer nr_topics_for_instance, Integer num_iterations, Integer numthreads) {
 		this.databaselable=databaselable;
 		categoryInt = new HashMap<String, Integer>();
 		this.modelcachedir = modelcachedir;
@@ -210,12 +211,12 @@ public class FlowerPower {
 		this.nr_topics_for_instance = nr_topics_for_instance;
 		if (num_iterations != null)
 			this.num_iterations = num_iterations;
-		
+		this.numthreads=numthreads==null?1:numthreads;
 	}
 
 	public FlowerPower(String databaselable,File modelcachedir, String model_dataset, String flower_dataset, int numtopics,
-			Integer nr_topics_for_instance) {
-		this(databaselable, modelcachedir, model_dataset, flower_dataset, numtopics, null, nr_topics_for_instance, null);
+			Integer nr_topics_for_instance,Integer numthreads) {
+		this(databaselable, modelcachedir, model_dataset, flower_dataset, numtopics, null, nr_topics_for_instance, null,numthreads);
 	}
 
 	public Hashtable<Integer, Topic> applyTopicModel(File modelfile) throws FlowerException {
@@ -771,7 +772,7 @@ public class FlowerPower {
 			}
 		} else {
 			model.addInstances(instances);
-			model.setNumThreads(1);
+			model.setNumThreads(numthreads);
 			model.setNumIterations(num_iterations);
 			try {
 				model.estimate();

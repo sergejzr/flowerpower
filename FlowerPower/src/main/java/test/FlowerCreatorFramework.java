@@ -156,9 +156,9 @@ public static void main(String[] args) {
 		for(Integer i:topicnrs)
 
 		{
-			pool.execute(new FlowerThread(databaselable,new File(args[4]), 
-					new File(args[5]),//"flower_cropped_auto5000_joint"
-					model_table,flower_table,i, 3, 2000, ordering
+			pool.execute(new FlowerThread(databaselable,new File(args[5]), 
+					new File(args[6]),//"flower_cropped_auto5000_joint"
+					model_table,flower_table,i, 3, 2000, Integer.parseInt(args[4]), ordering
 					));
 		}
 	

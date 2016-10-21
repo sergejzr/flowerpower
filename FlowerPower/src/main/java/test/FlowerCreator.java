@@ -47,14 +47,14 @@ public class FlowerCreator {
 		this.nr_topics_for_instance=nr_topics_for_instance;
 	}
 	
-	public Flower createFlower(String databaselable, File modelcachedir, String model_tablename, String flower_tablename, Integer topicNr, java.sql.Connection dbcon, int num_iterations, OrderStrategy ordering) throws FlowerException
+	public Flower createFlower(String databaselable, File modelcachedir, String model_tablename, String flower_tablename, Integer topicNr, java.sql.Connection dbcon, int num_iterations, Integer numthreads, OrderStrategy ordering) throws FlowerException
 	{
 this.ordering=ordering;
 		if(modelcachedir!=null && !modelcachedir.exists()){modelcachedir.mkdirs();}
 		 topicFlower = new FlowerPower(databaselable,modelcachedir,model_tablename
 				// "dataset_20newsgroup_full"
 				//"conference_proceedings_www_clean_new"
-				, flower_tablename,topicNr,dbcon,nr_topics_for_instance, num_iterations);// "table_name",
+				, flower_tablename,topicNr,dbcon,nr_topics_for_instance, num_iterations, numthreads);// "table_name",
 															// number of topics
 
 		Hashtable<Integer, Topic> topics =topicFlower.generateTopicModel();// Boolean
@@ -315,7 +315,7 @@ System.out
 			Flower f = fc.createFlower( "localhost",null,tabname
 					, tabname,
 					numtopics,//new File("rowtopocs_wikimovies"+"_"+numtopics+".dat")
-					null,2000, ordering
+					null,2000, 1,ordering
 			);
 	System.out.println("JAXB-FLOWER");
 			
@@ -402,7 +402,7 @@ System.out
 			
 		
 		// flower = fc.createFlower("auto5000_descriptions", 50,dbcon);
-			 flower = fc.createFlower(databaselable,null, tablename, tablename,nrtopics,dbcon,1000, ordering);
+			 flower = fc.createFlower(databaselable,null, tablename, tablename,nrtopics,dbcon,1000, 1, ordering);
 		 Marshaller marshaller = jaxbContext.createMarshaller();
 		 OutputStream outputStream = new FileOutputStream(cacheflower);
 		 try {

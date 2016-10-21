@@ -41,8 +41,10 @@ public class FlowerThread implements Runnable {
 
 	private String databaselable;
 
+	private Integer numthreads;
 
-	public FlowerThread(String databaselable, File cachedir, File modelcachedir, String model_table, String flower_table,Integer numtopics, Integer nr_topics_for_instance, int num_iterations, OrderStrategy ordering)
+
+	public FlowerThread(String databaselable, File cachedir, File modelcachedir, String model_table, String flower_table,Integer numtopics, Integer nr_topics_for_instance, int num_iterations, Integer numthreads,OrderStrategy ordering)
 	{
 		this.databaselable=databaselable;
 		this.cachedir=cachedir;
@@ -54,6 +56,7 @@ public class FlowerThread implements Runnable {
 		this.nr_topics_for_instance=nr_topics_for_instance;
 		this.num_iterations=num_iterations;
 		this.ordering=ordering;
+		this.numthreads=numthreads;
 	}
 @Override
 public void run() {
@@ -72,8 +75,8 @@ String chunk=flower_table.equals(model_table)?flower_table:flower_table+"_"+mode
 
 
 	Flower f = fc.createFlower( databaselable,modelcachedir,modeltouse
-	, flower_table,numtopics,null,num_iterations
-, ordering
+	, flower_table,numtopics,null,num_iterations,numthreads,
+ ordering
 	//new File("rowtopocs_wikimovies"+"_"+numtopics+".dat")
 	
 	);
@@ -138,7 +141,7 @@ String chunk=flower_table.equals(model_table)?flower_table:flower_table+"_"+mode
 		}
 	}
 	
-	printastable(clustered);
+	//printastable(clustered);
 	//System.out.println(f);
 	JAXBContext jaxbContext = JAXBContext.newInstance(Flower.class);
 	Marshaller marshaller = jaxbContext.createMarshaller();
