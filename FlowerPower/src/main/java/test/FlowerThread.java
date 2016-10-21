@@ -39,10 +39,12 @@ public class FlowerThread implements Runnable {
 
 	private OrderStrategy ordering;
 
+	private String databaselable;
 
-	public FlowerThread(File cachedir, File modelcachedir, String model_table, String flower_table, Integer numtopics,Integer nr_topics_for_instance, int num_iterations, OrderStrategy ordering)
+
+	public FlowerThread(String databaselable, File cachedir, File modelcachedir, String model_table, String flower_table,Integer numtopics, Integer nr_topics_for_instance, int num_iterations, OrderStrategy ordering)
 	{
-		
+		this.databaselable=databaselable;
 		this.cachedir=cachedir;
 		this.modelcachedir=modelcachedir;
 		this.modeltouse=model_table;
@@ -69,8 +71,9 @@ String chunk=flower_table.equals(model_table)?flower_table:flower_table+"_"+mode
 		FlowerCreator fc=new FlowerCreator(nr_topics_for_instance);
 
 
-	Flower f = fc.createFlower( modelcachedir,modeltouse,flower_table
-	, numtopics,null,num_iterations,ordering
+	Flower f = fc.createFlower( databaselable,modelcachedir,modeltouse
+	, flower_table,numtopics,null,num_iterations
+, ordering
 	//new File("rowtopocs_wikimovies"+"_"+numtopics+".dat")
 	
 	);

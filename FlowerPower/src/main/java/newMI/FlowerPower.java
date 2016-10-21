@@ -97,9 +97,9 @@ public class FlowerPower {
 			}
 		}
 	}
-	public static void main(String[] args) {
+	public static void main(String[] args) throws FlowerException {
 
-		FlowerPower topicFlower = new FlowerPower(null, "dataset_20newsgroup_full", "dataset_20newsgroup_full", 200,
+		FlowerPower topicFlower = new FlowerPower("localhost",null, "dataset_20newsgroup_full", "dataset_20newsgroup_full", 200,
 				null);
 		topicFlower.generateTopicModel();
 		topicFlower.printModel();
@@ -187,13 +187,15 @@ public class FlowerPower {
 	ArrayList<Integer> top5link;
 
 	public HashMap<String, Integer> userphotocount_map = new HashMap<String, Integer>();
+	private String databaselable;
 
-	public FlowerPower(File modelcachedir, String dataset, int numtopics, Integer nr_topics_for_instance) {
-		this(modelcachedir, dataset, dataset, numtopics, null, nr_topics_for_instance, null);
+	public FlowerPower(String databaselable,File modelcachedir, String dataset, int numtopics, Integer nr_topics_for_instance) {
+		this(databaselable, modelcachedir, dataset, dataset, numtopics, null, nr_topics_for_instance, null);
 	}
 
-	public FlowerPower(File modelcachedir, String model_dataset, String flower_dataset, int numtopics, Connection con,
-			Integer nr_topics_for_instance, Integer num_iterations) {
+	public FlowerPower(String databaselable, File modelcachedir, String model_dataset, String flower_dataset, int numtopics,
+			Connection con, Integer nr_topics_for_instance, Integer num_iterations) {
+		this.databaselable=databaselable;
 		categoryInt = new HashMap<String, Integer>();
 		this.modelcachedir = modelcachedir;
 		categoryRepMap = new HashMap<String, ArrayList<TopicLink>>();
@@ -208,14 +210,15 @@ public class FlowerPower {
 		this.nr_topics_for_instance = nr_topics_for_instance;
 		if (num_iterations != null)
 			this.num_iterations = num_iterations;
+		
 	}
 
-	public FlowerPower(File modelcachedir, String model_dataset, String flower_dataset, int numtopics,
+	public FlowerPower(String databaselable,File modelcachedir, String model_dataset, String flower_dataset, int numtopics,
 			Integer nr_topics_for_instance) {
-		this(modelcachedir, model_dataset, flower_dataset, numtopics, null, nr_topics_for_instance, null);
+		this(databaselable, modelcachedir, model_dataset, flower_dataset, numtopics, null, nr_topics_for_instance, null);
 	}
 
-	public Hashtable<Integer, Topic> applyTopicModel(File modelfile) {
+	public Hashtable<Integer, Topic> applyTopicModel(File modelfile) throws FlowerException {
 
 		ArrayList<Pipe> pipeList = new ArrayList<Pipe>();
 		// model = new ParallelTopicModel(numtopics, 1.0, 0.01);
@@ -506,16 +509,16 @@ public class FlowerPower {
 	}
 
 	public InstanceList fetchFromDB(InstanceList instances, String dataset, boolean onlyinstances)
-			throws ClassNotFoundException {
+			throws ClassNotFoundException, FlowerException {
 
 		try {
 			Connection dbcon = this.con;
 			if (this.con == null) {
 				Class.forName("com.mysql.jdbc.Driver");
-				this.con = 	 dbcon = DB.getConnection("l3s","flickrattractive");
+				this.con = 	 dbcon = DB.getConnection(databaselable,"mysql");
 				
 			}
-			PreparedStatement pstmt = dbcon.prepareStatement("SELECT * FROM `" + dataset + "` WHERE 1");
+			PreparedStatement pstmt = dbcon.prepareStatement("SELECT * FROM " + dataset + " WHERE 1");
 			ResultSet rs = pstmt.executeQuery();
 
 			System.out.println("Loading docs into instances");
@@ -565,6 +568,19 @@ public class FlowerPower {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		if(docMap.keySet().size()<2)
+		{
+			ArrayList<String> cats=new ArrayList<>();
+			for (String s : docMap.keySet()) 
+			{
+				cats.add("category: "+s+", count: "+docMap.get(s).size()+"\n");
+			}
+			
+			
+			throw new FlowerException("The application can not run with a single category in your source table: \n"+cats);
+		}
+		
 		if (!onlyinstances) {
 			System.out.println("Categories: " + docMap.keySet().size());
 			int c = 0;
@@ -703,7 +719,7 @@ public class FlowerPower {
 		return ret;
 	}
 
-	public Hashtable<Integer, Topic> generateTopicModel() {
+	public Hashtable<Integer, Topic> generateTopicModel() throws FlowerException {
 
 		String chunk = flower_dataset.equals(model_dataset) ? flower_dataset : flower_dataset + "_" + model_dataset;
 

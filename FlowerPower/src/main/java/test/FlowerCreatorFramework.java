@@ -14,7 +14,7 @@ public static void main(String[] args) {
 	
 	if(args.length<4)
 	{
-		System.out.println("Usage arguments: table topicnr1,topicnr2,.. order{natural|optimal} cachedir modeldir");
+		System.out.println("Usage arguments: table topicnr1,topicnr2,.. order{natural|optimal} databaselable cachedir modeldir");
 		return;
 	}
 	
@@ -146,6 +146,7 @@ public static void main(String[] args) {
 	{
 		ordering=OrderStrategy.optimalOrderung;
 	}
+	String databaselable=args[3];
 	for(String flower_table:infos.keySet())
 	{
 		String model_table=infos.get(flower_table);
@@ -155,9 +156,9 @@ public static void main(String[] args) {
 		for(Integer i:topicnrs)
 
 		{
-			pool.execute(new FlowerThread(new File(args[3]),new File(args[4]), 
-					//"flower_cropped_auto5000_joint"
-					model_table,flower_table,i,3, 2000, ordering
+			pool.execute(new FlowerThread(databaselable,new File(args[4]), 
+					new File(args[5]),//"flower_cropped_auto5000_joint"
+					model_table,flower_table,i, 3, 2000, ordering
 					));
 		}
 	

@@ -33,6 +33,7 @@ import de.l3s.flower.Terms;
 import de.l3s.flower.Topic;
 import de.l3s.flower.TopicLink;
 import de.l3s.flower.Topics;
+import newMI.FlowerException;
 import newMI.FlowerPower;
 import newMI.FlowerPower.OrderStrategy;
 
@@ -46,14 +47,14 @@ public class FlowerCreator {
 		this.nr_topics_for_instance=nr_topics_for_instance;
 	}
 	
-	public Flower createFlower(File modelcachedir, String model_tablename, String flower_tablename, Integer topicNr, java.sql.Connection dbcon, int num_iterations, OrderStrategy ordering)
+	public Flower createFlower(String databaselable, File modelcachedir, String model_tablename, String flower_tablename, Integer topicNr, java.sql.Connection dbcon, int num_iterations, OrderStrategy ordering) throws FlowerException
 	{
 this.ordering=ordering;
 		if(modelcachedir!=null && !modelcachedir.exists()){modelcachedir.mkdirs();}
-		 topicFlower = new FlowerPower(modelcachedir,model_tablename,flower_tablename
+		 topicFlower = new FlowerPower(databaselable,modelcachedir,model_tablename
 				// "dataset_20newsgroup_full"
 				//"conference_proceedings_www_clean_new"
-				, topicNr,dbcon,nr_topics_for_instance,num_iterations);// "table_name",
+				, flower_tablename,topicNr,dbcon,nr_topics_for_instance, num_iterations);// "table_name",
 															// number of topics
 
 		Hashtable<Integer, Topic> topics =topicFlower.generateTopicModel();// Boolean
@@ -296,81 +297,89 @@ System.out
 	}
 	public static void main(String[] args) throws JAXBException, IOException {
 		
-		FlowerCreator fc=new FlowerCreator(null);
-		String tabname=//"auto5000_descriptions"
-				"flower_wikimovies_nopersons_copy"
-				//"rowtopocs_wikimovies"
-				//"dataset_20newsgroup_full"
-				//"conference_proceedings_chi_clean"
-				//"flower_emotions_clean"
-				//"conference_proceedings_paragraphs"
-				//"conference_proceedings_www_clean_new"
-				;
-				Integer numtopics=200;
-		OrderStrategy ordering=OrderStrategy.optimalOrderung;
-		Flower f = fc.createFlower( null,tabname,tabname
-				, numtopics,
-				//new File("rowtopocs_wikimovies"+"_"+numtopics+".dat")
-				null,2000,ordering
-		);
-System.out.println("JAXB-FLOWER");
-		
-		System.out.println("ordering");
-		
-		for(Category cat:f.getOrderedCategories())
-		{
-			System.out.print(cat.getName()+",");	
-		}
-		System.out.println();
-		
-		for(Connection con:f.getOrderedConnections())
-		{
-			System.out.println(f.getCategoryById(con.getCat1()).getName()+" - "+f.getCategoryById(con.getCat2()).getName());
-			System.out.println("sinilarity:"+con.getSimilarity());
-		}
-		System.out.println();
-		
-		
-		System.out.println("top general topics");
-		 for(TopicLink tl: f.getOrderedTopics(f.getGeneral().getTopic(),false))
-		 {
-			 System.out.print(f.getTopicById(tl.getTid()).getLable()+",");
-		 }
-		 
-		 System.out.println();
-		 for(Category cat:f.getOrderedCategories())
+
+		try {
+			
+			FlowerCreator fc=new FlowerCreator(null);
+			String tabname=//"auto5000_descriptions"
+					"flower_wikimovies_nopersons_copy"
+					//"rowtopocs_wikimovies"
+					//"dataset_20newsgroup_full"
+					//"conference_proceedings_chi_clean"
+					//"flower_emotions_clean"
+					//"conference_proceedings_paragraphs"
+					//"conference_proceedings_www_clean_new"
+					;
+					Integer numtopics=200;
+			OrderStrategy ordering=OrderStrategy.optimalOrderung;
+			Flower f = fc.createFlower( "localhost",null,tabname
+					, tabname,
+					numtopics,//new File("rowtopocs_wikimovies"+"_"+numtopics+".dat")
+					null,2000, ordering
+			);
+	System.out.println("JAXB-FLOWER");
+			
+			System.out.println("ordering");
+			
+			for(Category cat:f.getOrderedCategories())
 			{
-				System.out.println(cat.getName()+", num docs:"+cat.getNumDocs()+"");
-				
-				
-				for(TopicLink rtop : f.getOrderedTopics(cat.getTopic(),false))
-				{
-					Topic t = f.getTopicById(rtop.getTid());
-					System.out.print(t.getLable()+"("+rtop.getTid()+"),");
-				}
-				System.out.println();
-				Connection con=f.getConnectionByLeadingCatId(cat.getId());
-				System.out.println("Connection:"+f.getLable(con)+"["+con.getSimilarity()+"]");
-				for(TopicLink rtop : f.getOrderedTopics(con.getTopic(),false))
-				{
-					Topic t = f.getTopicById(rtop.getTid());
-					System.out.print(t.getLable()+"("+t.getTid()+"),");
-				}
-				System.out.println();
+				System.out.print(cat.getName()+",");	
 			}
-		
-		//System.out.println(f);
-		JAXBContext jaxbContext = JAXBContext.newInstance(Flower.class);
-		 Marshaller marshaller = jaxbContext.createMarshaller();
-		 OutputStream outputStream = new FileOutputStream(new File(tabname+"_"+numtopics+".xml"));
-		 try {
-		     marshaller.marshal(f, outputStream);
-		 } finally {
-		     outputStream.close();
-		 }
+			System.out.println();
+			
+			for(Connection con:f.getOrderedConnections())
+			{
+				System.out.println(f.getCategoryById(con.getCat1()).getName()+" - "+f.getCategoryById(con.getCat2()).getName());
+				System.out.println("sinilarity:"+con.getSimilarity());
+			}
+			System.out.println();
+			
+			
+			System.out.println("top general topics");
+			 for(TopicLink tl: f.getOrderedTopics(f.getGeneral().getTopic(),false))
+			 {
+				 System.out.print(f.getTopicById(tl.getTid()).getLable()+",");
+			 }
+			 
+			 System.out.println();
+			 for(Category cat:f.getOrderedCategories())
+				{
+					System.out.println(cat.getName()+", num docs:"+cat.getNumDocs()+"");
+					
+					
+					for(TopicLink rtop : f.getOrderedTopics(cat.getTopic(),false))
+					{
+						Topic t = f.getTopicById(rtop.getTid());
+						System.out.print(t.getLable()+"("+rtop.getTid()+"),");
+					}
+					System.out.println();
+					Connection con=f.getConnectionByLeadingCatId(cat.getId());
+					System.out.println("Connection:"+f.getLable(con)+"["+con.getSimilarity()+"]");
+					for(TopicLink rtop : f.getOrderedTopics(con.getTopic(),false))
+					{
+						Topic t = f.getTopicById(rtop.getTid());
+						System.out.print(t.getLable()+"("+t.getTid()+"),");
+					}
+					System.out.println();
+				}
+			
+			//System.out.println(f);
+			JAXBContext jaxbContext = JAXBContext.newInstance(Flower.class);
+			 Marshaller marshaller = jaxbContext.createMarshaller();
+			 OutputStream outputStream = new FileOutputStream(new File(tabname+"_"+numtopics+".xml"));
+			 try {
+			     marshaller.marshal(f, outputStream);
+			 } finally {
+			     outputStream.close();
+			 }
+			 
+		} catch (FlowerException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		 
 	}
-	private Flower getCached(String tablename, Integer nrtopics,FlowerCreator fc) throws JAXBException, IOException, ClassNotFoundException, SQLException {
+	private Flower getCached(String databaselable, String tablename,Integer nrtopics, FlowerCreator fc) throws JAXBException, IOException, ClassNotFoundException, SQLException, FlowerException {
 
 		File cachedir=new File("/data3/zerr/flowers");
 		File cacheflower=new File(tablename+"-"+nrtopics+"_flower.xml");
@@ -393,7 +402,7 @@ System.out.println("JAXB-FLOWER");
 			
 		
 		// flower = fc.createFlower("auto5000_descriptions", 50,dbcon);
-			 flower = fc.createFlower(null,tablename, tablename, nrtopics,dbcon,1000,ordering);
+			 flower = fc.createFlower(databaselable,null, tablename, tablename,nrtopics,dbcon,1000, ordering);
 		 Marshaller marshaller = jaxbContext.createMarshaller();
 		 OutputStream outputStream = new FileOutputStream(cacheflower);
 		 try {

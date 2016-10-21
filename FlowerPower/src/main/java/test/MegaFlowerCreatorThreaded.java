@@ -153,9 +153,10 @@ public static void main(String[] args) {
 				})
 
 		{
-			pool.execute(new FlowerThread(new File("/home/zerr/flower_streetart_cropping"),new File("/home/zerr/flower_streetart_cropping"), 
-					//"flower_cropped_auto5000_joint"
-					model_table,flower_table,i,3, 2000, OrderStrategy.optimalOrderung//naturalOrdering
+			pool.execute(new FlowerThread("localhost",new File("/home/zerr/flower_streetart_cropping"), 
+					new File("/home/zerr/flower_streetart_cropping"),//"flower_cropped_auto5000_joint"
+					model_table,flower_table,i, 3, 2000
+, OrderStrategy.optimalOrderung//naturalOrdering
 					));
 		}
 	
