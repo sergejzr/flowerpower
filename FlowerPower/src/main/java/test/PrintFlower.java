@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 
 import de.l3s.flower.TopicLink;
+import de.l3s.source.DataSource;
 import newMI.FlowerException;
 import newMI.FlowerPower;
 
@@ -15,7 +16,7 @@ public class PrintFlower {
 
 		try {
 
-			FlowerPower topicFlower = new FlowerPower( "localhost", null,"flower_wikimovies_clean"
+			FlowerPower topicFlower = new FlowerPower( new DataSource("localhost", "flower_wikimovies_clean", null), null,"flower_wikimovies_clean"
 					// "dataset_20newsgroup_full"
 					//"conference_proceedings_www_clean_new"
 					, 100,1,null);// "table_name",

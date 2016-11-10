@@ -47,11 +47,11 @@ public class FlowerImage  {
 	BufferedImage bi=null;
 int shiftmargin=1000;
 private int TOPIC_GENERAL_LENGTH=5;
-private int TOPIC_GENERAL_NUMBER=5;
+private int TOPIC_GENERAL_NUMBER=3;
 private int TOPIC_CONNECTION_LENGTH=5;
-private int TOPIC_CONNECTION_NUMBER=5;
+private int TOPIC_CONNECTION_NUMBER=3;
 private int TOPIC_GATEGORY_LENGTH=5;
-private int TOPIC_CATEGORY_NUMBER=8;
+private int TOPIC_CATEGORY_NUMBER=6;
 
 public FlowerImage() {
 	// TODO Auto-generated constructor stub

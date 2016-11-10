@@ -33,6 +33,7 @@ import de.l3s.flower.Terms;
 import de.l3s.flower.Topic;
 import de.l3s.flower.TopicLink;
 import de.l3s.flower.Topics;
+import de.l3s.source.DataSource;
 import newMI.FlowerException;
 import newMI.FlowerPower;
 import newMI.FlowerPower.OrderStrategy;
@@ -47,7 +48,7 @@ public class FlowerCreator {
 		this.nr_topics_for_instance=nr_topics_for_instance;
 	}
 	
-	public Flower createFlower(String databaselable, File modelcachedir, String model_tablename, String flower_tablename, Integer topicNr, java.sql.Connection dbcon, int num_iterations, Integer numthreads, OrderStrategy ordering) throws FlowerException
+	public Flower createFlower(DataSource databaselable, File modelcachedir, String model_tablename, String flower_tablename, Integer topicNr, java.sql.Connection dbcon, int num_iterations, Integer numthreads, OrderStrategy ordering) throws FlowerException
 	{
 this.ordering=ordering;
 		if(modelcachedir!=null && !modelcachedir.exists()){modelcachedir.mkdirs();}
@@ -312,7 +313,9 @@ System.out
 					;
 					Integer numtopics=200;
 			OrderStrategy ordering=OrderStrategy.optimalOrderung;
-			Flower f = fc.createFlower( "localhost",null,tabname
+			
+			
+			Flower f = fc.createFlower( new DataSource("localhost", tabname, tabname),null,tabname
 					, tabname,
 					numtopics,//new File("rowtopocs_wikimovies"+"_"+numtopics+".dat")
 					null,2000, 1,ordering
@@ -379,7 +382,7 @@ System.out
 		}
 		 
 	}
-	private Flower getCached(String databaselable, String tablename,Integer nrtopics, FlowerCreator fc) throws JAXBException, IOException, ClassNotFoundException, SQLException, FlowerException {
+	private Flower getCached(DataSource databaselable, String tablename,Integer nrtopics, FlowerCreator fc) throws JAXBException, IOException, ClassNotFoundException, SQLException, FlowerException {
 
 		File cachedir=new File("/data3/zerr/flowers");
 		File cacheflower=new File(tablename+"-"+nrtopics+"_flower.xml");
@@ -417,5 +420,6 @@ System.out
 	public void storeModel() {
 		topicFlower.storeModel();
 		
-	}	
+	}
+
 }

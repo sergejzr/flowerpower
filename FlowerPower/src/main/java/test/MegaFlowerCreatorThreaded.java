@@ -6,6 +6,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import de.l3s.source.DataSource;
 import newMI.FlowerPower.OrderStrategy;
 
 public class MegaFlowerCreatorThreaded {
@@ -153,7 +154,7 @@ public static void main(String[] args) {
 				})
 
 		{
-			pool.execute(new FlowerThread("localhost",new File("/home/zerr/flower_streetart_cropping"), 
+			pool.execute(new FlowerThread(new DataSource("localhost",model_table,flower_table),new File("/home/zerr/flower_streetart_cropping"), 
 					new File("/home/zerr/flower_streetart_cropping"),//"flower_cropped_auto5000_joint"
 					model_table,flower_table,i, 3, 2000,1
 , OrderStrategy.optimalOrderung//naturalOrdering

@@ -441,7 +441,7 @@ public class MICategoryCal {
 			double[] distribution = model.getInferencer().getSampledDistribution(loadedinstances.get(0), 100, 2, 15);
 			loadedinstances.remove(0);
 				 for(int i=0; i<numtopics;i++)
-			        	distribution_sum[i]+=distribution[i]*(double)(1/idCatCount.get(doc.id));
+			        	distribution_sum[i]+=distribution[i]*(double)(1./idCatCount.get(doc.id));
 				 
 				 count_cat++;
 				
@@ -460,9 +460,9 @@ public class MICategoryCal {
 		 System.out.println(Arrays.toString(top));
 		 
 		 for(int i=0; i<numtopics;i++)
-	        	distribution_avg_corp[i]=distribution_sum_corp[i]/(count);
+	        	distribution_avg_corp[i]=distribution_sum_corp[i]/(1.*count);
 		 //p(c)
-		 double prob_of_category=(double)count_cat/count;
+		 double prob_of_category=(double)1.*count_cat/count;
 		 //p(z_i) -> directly from mallet
 	
 		 ArrayList<TermMI> list= new ArrayList<MICategoryCal.TermMI>();

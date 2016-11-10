@@ -30,7 +30,7 @@ public class LemmatizeFramework {
 	public void setTable(String table) {
 		this.table = table;
 	}
-	public  void lemmatizeParallel(String langtoken,int numthreads, String[] poss)
+	public  void lemmatizeParallel(String langtoken,int numthreads, String[] poss, boolean stem, String[] stopwords)
 	{
 		//lemma lem= new lemma();
 		//lem.init();
@@ -70,7 +70,7 @@ public class LemmatizeFramework {
 	        for(int i=0;i<numthreads;i++)
 	        {
 	        	LemmatizeThread t;
-				executor.execute(t=new LemmatizeThread(origidx,towork,langtoken,poss));
+				executor.execute(t=new LemmatizeThread(origidx,towork,langtoken,poss, stem,stopwords));
 				myworkers.add(t);
 	        }
 	       
@@ -268,7 +268,7 @@ public class LemmatizeFramework {
 		if(args.length<3)//java -cp FlowerPower-0.0.1-SNAPSHOT-jar-with-dependencies.jar test.LemmatizeFramework
 
 		{
-			System.out.println("use with arguments : java -jar LemmatizeFramework database_table language N,V,A");
+			System.out.println("use with arguments : java -jar LemmatizeFramework database_table language N,V,A stemm stopwordlist");
 			return;
 		}
 			String lang=args[1];
@@ -291,7 +291,7 @@ public class LemmatizeFramework {
 				args[0]
 				);
 		
-		ld.lemmatizeParallel(lang,20, poss);
+		ld.lemmatizeParallel(lang,20, poss,args[3].equals("stem"),args[4].split(","));
 	}
 
 }

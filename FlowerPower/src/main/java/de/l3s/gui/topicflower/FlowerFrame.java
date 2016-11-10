@@ -205,25 +205,6 @@ public static void main(String[] args) {
 		if(!cf.toString().endsWith("xml")){continue;}
 		
 		convertIm(cf,outdir);
-		/*
-	//	if(!cf.toString().contains("christianity")){continue;}
-	//	if(!cf.toString().contains("1000")){continue;}
-		//if(!cf.toString().contains("flower_wikimovies_nopersons_1000.xml")){continue;}
-		if(cf.toString().contains("auto5000")){continue;}
-	//	if(!cf.toString().contains("rowtopocs_wikimovies")||!cf.toString().contains("_500")){continue;}
-//		if(!cf.toString().contains("auto5000")||!cf.toString().contains("_500")){continue;}
-		
-	FlowerFrame f=new FlowerFrame(dir,cf.getName()
-			//"flower_wikimovies_nopersons_500.xml"
-			
-			);
-	//f.convert(flowerxml_in, flowerimg_outdir)
-	
-	//f.getContentPane().add(fp,BorderLayout.CENTER);
-	f.setBounds(100, 100, 500, 500);
-	f.setVisible(true);
-	break;
-	*/
 	}
 
 	

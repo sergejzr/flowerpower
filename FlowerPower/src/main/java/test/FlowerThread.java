@@ -20,6 +20,7 @@ import de.l3s.flower.Flower;
 import de.l3s.flower.Instance;
 import de.l3s.flower.Topic;
 import de.l3s.flower.TopicLink;
+import de.l3s.source.DataSource;
 import newMI.FlowerPower.OrderStrategy;
 
 public class FlowerThread implements Runnable {
@@ -39,14 +40,14 @@ public class FlowerThread implements Runnable {
 
 	private OrderStrategy ordering;
 
-	private String databaselable;
+	private DataSource databaselable;
 
 	private Integer numthreads;
 
 
-	public FlowerThread(String databaselable, File cachedir, File modelcachedir, String model_table, String flower_table,Integer numtopics, Integer nr_topics_for_instance, int num_iterations, Integer numthreads,OrderStrategy ordering)
+	public FlowerThread(DataSource databaselable2, File cachedir, File modelcachedir, String model_table, String flower_table,Integer numtopics, Integer nr_topics_for_instance, int num_iterations, Integer numthreads,OrderStrategy ordering)
 	{
-		this.databaselable=databaselable;
+		this.databaselable=databaselable2;
 		this.cachedir=cachedir;
 		this.modelcachedir=modelcachedir;
 		this.modeltouse=model_table;

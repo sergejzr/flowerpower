@@ -59,7 +59,7 @@ public class LemmatizeDBTable {
 	        for(int i=0;i<numthreads;i++)
 	        {
 	        	LemmatizeThread t;
-				executor.execute(t=new LemmatizeThread(origidx,towork,langtoken,"N".split(",")));
+				executor.execute(t=new LemmatizeThread(origidx,towork,langtoken,"N".split(","),false, null));
 				myworkers.add(t);
 	        }
 	        

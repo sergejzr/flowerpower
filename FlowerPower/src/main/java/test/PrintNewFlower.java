@@ -15,6 +15,7 @@ import de.l3s.flower.General;
 import de.l3s.flower.Topic;
 import de.l3s.flower.TopicLink;
 import de.l3s.flower.Topics;
+import de.l3s.source.DataSource;
 import newMI.FlowerException;
 import newMI.FlowerPower;
 
@@ -25,7 +26,7 @@ public class PrintNewFlower {
 															// number of topics
 
 		try {
-			FlowerPower topicFlower = new FlowerPower("loclahost", null,"auto5000_descriptions"
+			FlowerPower topicFlower = new FlowerPower(new DataSource("localhost", "flower_wikimovies_clean", null), null,"auto5000_descriptions"
 					// "dataset_20newsgroup_full"
 					//"conference_proceedings_www_clean_new"
 					, 50,1,null);// "table_name",

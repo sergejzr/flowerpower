@@ -39,6 +39,23 @@ public class DB {
 			  return con;
 		
 	}
+	public static Connection getConnection(String dbhost,String username,String password) throws ClassNotFoundException, SQLException, IOException
+	{
+		
+	
+
+			   String driver = "com.mysql.jdbc.Driver";
+			   if (driver != null) {
+			       Class.forName(driver) ;
+			   }
+
+			   String url = dbhost;
+
+
+			  Connection con = DriverManager.getConnection(url+"?useCompression=true", username, password);
+			  return con;
+		
+	}
 	public static Connection getLocalConnection() throws ClassNotFoundException, SQLException, IOException
 	{
 		return getConnection("localhost",null);

@@ -26,6 +26,7 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.Vector;
+import java.util.prefs.BackingStoreException;
 import java.util.regex.Pattern;
 
 import cc.mallet.pipe.CharSequence2TokenSequence;
@@ -50,6 +51,7 @@ import de.l3s.source.FowerReadException;
 import l3s.rdj.document.Document;
 import l3s.rdj.impl.AllPairsDJ;
 import l3s.toolbox.JaccardSimilarityComparator;
+import newMI.FlowerPower.OrderStrategy;
 import test.DiagramInput;
 
 //import meta.dbaccess.*; 
@@ -68,14 +70,9 @@ import test.DiagramInput;
 /**
  * Klasse zur MI-Selektion faer binaere Klassifikation
  */
-public class FlowerPower {
+public class FlowerPowerX {
 
-	public enum OrderStrategy {
 
-		naturalOrdering,
-
-		optimalOrderung
-	}
 	private OrderStrategy ordering;
 	public void setOrdering(OrderStrategy ordering) {
 		this.ordering = ordering;
@@ -100,64 +97,19 @@ public class FlowerPower {
 			}
 		}
 	}
-	public static void main(String[] args) throws FlowerException {
 
-		FlowerPower topicFlower = new FlowerPower(new DataSource("localhost","dataset_20newsgroup_full", null),null, "dataset_20newsgroup_full", "dataset_20newsgroup_full", 200,
-				null,1);
-		topicFlower.generateTopicModel();
-		topicFlower.printModel();
-		topicFlower.limitDataset(400000);
-		topicFlower.computeOrdering();
-		topicFlower.computeMILists();
-		topicFlower.computeMIPairLists();
-		topicFlower.computeTop5();
-		DiagramInput di2 = topicFlower.diagramGen();
-
-		HashMap<Integer, String> temp = topicFlower.getIntCategory();
-		// ArrayList<de.l3s.graphics.Petal> petals= new ArrayList<Petal>();
-		System.out.println("Ordering: ");
-		for (int i : topicFlower.getOptimalordering()) {
-			System.out.print(temp.get(i) + ",");
-			/*
-			 * Petal p= new Petal(); p.setCategory(temp.get(i));
-			 * p.setTopics(di2.getCategoryRepMap().get(""+i)); petals.add(p);
-			 */
-		}
-		System.out.println();
-		for (String key : di2.getCombiningTopics().keySet()) {
-			ArrayList<TopicLink> list = di2.getCombiningTopics().get(key);
-			String[] categoriesinpair = key.split("-");
-			ArrayList<TopicLink> t1 = di2.getCategoryRepMap().get(categoriesinpair[0]);
-			ArrayList<TopicLink> t2 = di2.getCategoryRepMap().get(categoriesinpair[1]);
-			System.out.println(temp.get(Integer.parseInt(categoriesinpair[0])));
-			System.out.println(Arrays.toString(t1.toArray()));
-			System.out.println();
-			System.out.println(temp.get(Integer.parseInt(categoriesinpair[0])) + "-"
-					+ temp.get(Integer.parseInt(categoriesinpair[1])));
-			System.out.println("similarity score:" + topicFlower.getScoremap().get(key));
-			System.out.println(Arrays.toString(list.toArray()));
-			System.out.println();
-			System.out.println(temp.get(Integer.parseInt(categoriesinpair[1])));
-			System.out.println(Arrays.toString(t2.toArray()));
-			System.out.println("-----------------------------------------------");
-
-		}
-		// Flower f= new Flower(petals.size(), petals);
-		// f.generate();
-
-	}
 	public int[] catarray;
 	public HashMap<String, Integer> categoryInt = new HashMap<String, Integer>();
 	HashMap<String, ArrayList<TopicLink>> categoryRepMap;
 	HashMap<String, ArrayList<Double>> categoryScoresMap = new HashMap<String, ArrayList<Double>>();
 	private Hashtable<String, int[]> clustered = new Hashtable<String, int[]>();
 	HashMap<String, ArrayList<TopicLink>> combiningTopics;
-	private Connection con;
+
 	DiagramInput di;
 
 	public HashMap<String, ArrayList<DocMI>> docMap = new HashMap<String, ArrayList<DocMI>>();
 	public HashMap<Integer, ArrayList<DocMI>> DocsMap = new HashMap<Integer, ArrayList<DocMI>>();
-	private String flower_dataset;
+
 	public HashMap<String, Integer> idCatCount = new HashMap<String, Integer>();
 	public HashMap<String, String> idText = new HashMap<String, String>();
 	Hashtable<Integer, String> instansids = new Hashtable<Integer, String>();
@@ -166,14 +118,8 @@ public class FlowerPower {
 	public InstanceList loadedinstances = null;
 	private MICategoryCal mic;
 	public ParallelTopicModel model;
-	private String model_dataset;
-	private File modelcachedir;
 	InstanceList newInst;
-	private Integer nr_topics_for_instance;
 
-	private int num_iterations = 1000;
-
-	int numtopics;
 
 	public List<Integer> optimalordering = new ArrayList<Integer>();
 
@@ -190,37 +136,40 @@ public class FlowerPower {
 	ArrayList<Integer> top5link;
 
 	public HashMap<String, Integer> userphotocount_map = new HashMap<String, Integer>();
-	private DataSource databaselable;
+
 	private int numthreads;
+	private int numtopics;
+	private Integer nr_topics_for_instance;
+	private File inputdir;
+	private File backgrounddir;
+	private boolean usemodel;
+	private File modeloutputfile;
+	private int iternumnum;
 
-	public FlowerPower(DataSource databaselable,File modelcachedir, String dataset, int numtopics, Integer nr_topics_for_instance,Integer numthreads) {
-		this(databaselable, modelcachedir, dataset, dataset, numtopics, null, nr_topics_for_instance, null,numthreads);
-	}
 
-	public FlowerPower(DataSource databaselable, File modelcachedir, String model_dataset, String flower_dataset, int numtopics,
-			Connection con, Integer nr_topics_for_instance, Integer num_iterations, Integer numthreads) {
-		this.databaselable=databaselable;
-		categoryInt = new HashMap<String, Integer>();
-		this.modelcachedir = modelcachedir;
+
+
+	public FlowerPowerX(int numtopics, int nr_topics_for_instance, File inputdir, File backgrounddir, int ldathreadsnum, int iternumnum, boolean usemodel, File modeloutputfile) {
+	
+		this.numtopics=numtopics;
+		this.nr_topics_for_instance=nr_topics_for_instance;
+		this.inputdir=inputdir;
+		this.backgrounddir=backgrounddir;
+		this.iternumnum=iternumnum;
+		this.numthreads=ldathreadsnum;
+		this.usemodel=usemodel;
+		this.modeloutputfile=modeloutputfile;
+		
+
 		categoryRepMap = new HashMap<String, ArrayList<TopicLink>>();
 		top5 = new ArrayList<String>();
 		top5link = new ArrayList<Integer>();
-		this.model_dataset = model_dataset;
-		this.flower_dataset = flower_dataset;
-		this.numtopics = numtopics;
 		di = new DiagramInput();
 		labels = new HashMap<String, String>();
-		this.con = con;
-		this.nr_topics_for_instance = nr_topics_for_instance;
-		if (num_iterations != null)
-			this.num_iterations = num_iterations;
-		this.numthreads=numthreads==null?1:numthreads;
+		categoryInt = new HashMap<String, Integer>();
 	}
 
-	public FlowerPower(DataSource databaselable,File modelcachedir, String model_dataset, String flower_dataset, int numtopics,
-			Integer nr_topics_for_instance,Integer numthreads) {
-		this(databaselable, modelcachedir, model_dataset, flower_dataset, numtopics, null, nr_topics_for_instance, null,numthreads);
-	}
+	
 
 	public Hashtable<Integer, Topic> applyTopicModel(File modelfile) throws FlowerException {
 
@@ -241,7 +190,7 @@ public class FlowerPower {
 		InstanceList instances = new InstanceList(new SerialPipes(pipeList));
 
 		
-			instances = fetchFromDB(instances, databaselable, false);
+			instances = fetchFromDB(instances, new DataSource(inputdir), false);
 		
 		userphotocount_map = null;
 		loadedinstances = instances;
@@ -257,8 +206,8 @@ public class FlowerPower {
 			}
 		} else {
 			model.addInstances(instances);
-			model.setNumThreads(4);
-			model.setNumIterations(400);
+			model.setNumThreads(this.numthreads);
+			model.setNumIterations(this.iternumnum);
 			try {
 				model.estimate();
 			} catch (IOException e) {
@@ -513,7 +462,7 @@ public class FlowerPower {
 			throws  FlowerException {
 
 		try {
-			
+			dataset.connect();
 			System.out.println("Loading docs into instances");
 
 			while (dataset.hasNext()) {
@@ -588,158 +537,8 @@ public class FlowerPower {
 		return instances;
 
 	}
-	public InstanceList fetchFromDB_goodold(InstanceList instances, String dataset, boolean onlyinstances)
-			throws ClassNotFoundException, FlowerException {
 
-		try {
-			Connection dbcon = this.con;
-			if (this.con == null) {
-				Class.forName("com.mysql.jdbc.Driver");
-				this.con = 	 dbcon = DB.getConnection(databaselable+"",null);
-				
-			}
-			PreparedStatement pstmt = dbcon.prepareStatement("SELECT * FROM " + dataset + " WHERE 1");
-			ResultSet rs = pstmt.executeQuery();
 
-			System.out.println("Loading docs into instances");
-
-			while (rs.next()) {
-				String text = rs.getString("lem_nouns");
-				if (text == "" || numOfWords(text) < 3)
-					continue;
-				String key = rs.getString("category");
-				String[] categories = key.trim().split(",");
-
-				for (String k : categories) {
-					if (!onlyinstances) {
-						ArrayList<DocMI> t = docMap.get(k);
-						if (t == null) {
-							t = new ArrayList<DocMI>();
-						}
-
-						t.add(new DocMI("" + rs.getInt("id"), text, rs.getString("document_id")));
-						docMap.put(k, t);
-						Integer c = idCatCount.get("" + rs.getInt("id"));
-						if (c == null)
-							c = 0;
-						idCatCount.put("" + rs.getInt("id"), ++c);
-					}
-					String str = rs.getInt("id") + " news " + text;
-
-					Reader fileReader = new InputStreamReader(new ByteArrayInputStream(str.getBytes("UTF-8")), "UTF-8");
-					int curidx = instances.size();
-					instansids.put(curidx, rs.getString("document_id"));
-					instances.addThruPipe(
-							new CsvIterator(fileReader, Pattern.compile("^(\\S*)[\\s,]*(\\S*)[\\s,]*(.*)$"), 3, 2, 1)); // data,
-																														// label,
-																														// name
-																														// fields
-				}
-
-			}
-			// System.out.println(comp+","+rec+","+talk);
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		if(docMap.keySet().size()<2)
-		{
-			ArrayList<String> cats=new ArrayList<>();
-			for (String s : docMap.keySet()) 
-			{
-				cats.add("category: "+s+", count: "+docMap.get(s).size()+"\n");
-			}
-			
-			
-			throw new FlowerException("The application can not run with a single category in your source table: \n"+cats);
-		}
-		
-		if (!onlyinstances) {
-			System.out.println("Categories: " + docMap.keySet().size());
-			int c = 0;
-			for (String s : docMap.keySet()) {
-				categoryInt.put(s, c);
-				intCategory.put(c, s);
-				c++;
-				System.out.println(s + " docs:" + docMap.get(s).size());
-			}
-		}
-		return instances;
-
-	}
-	public InstanceList fetchFromDB_old(InstanceList instances, String dataset) throws ClassNotFoundException {
-
-		try {
-			Connection dbcon = this.con;
-			if (this.con == null) {
-				Class.forName("com.mysql.jdbc.Driver");
-				this.con = 	 dbcon = DB.getConnection("jdbc:mysql://mysql.l3s.uni-hannover.de?characterEncoding=utf8","flickrattractive");
-				
-			}
-			PreparedStatement pstmt = dbcon.prepareStatement("SELECT * FROM `" + getDataset() + "` WHERE 1");
-			ResultSet rs = pstmt.executeQuery();
-
-			System.out.println("Loading docs into instances");
-
-			while (rs.next()) {
-				String text = rs.getString("lem_nouns");
-				if (text == "" || numOfWords(text) < 3)
-					continue;
-				String key = rs.getString("category");
-				String[] categories = key.trim().split(",");
-
-				for (String k : categories) {
-					ArrayList<DocMI> t = docMap.get(k);
-					if (t == null) {
-						t = new ArrayList<DocMI>();
-					}
-
-					t.add(new DocMI("" + rs.getInt("id"), text, rs.getString("document_id")));
-					docMap.put(k, t);
-					Integer c = idCatCount.get("" + rs.getInt("id"));
-					if (c == null)
-						c = 0;
-					idCatCount.put("" + rs.getInt("id"), ++c);
-					String str = rs.getInt("id") + " news " + text;
-					Reader fileReader = new InputStreamReader(new ByteArrayInputStream(str.getBytes()), "UTF-8");
-					instances.addThruPipe(
-							new CsvIterator(fileReader, Pattern.compile("^(\\S*)[\\s,]*(\\S*)[\\s,]*(.*)$"), 3, 2, 1)); // data,
-																														// label,
-																														// name
-																														// fields
-				}
-
-			}
-			// System.out.println(comp+","+rec+","+talk);
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		System.out.println("Categories: " + docMap.keySet().size());
-		int c = 0;
-		for (String s : docMap.keySet()) {
-			categoryInt.put(s, c);
-			intCategory.put(c, s);
-			c++;
-			System.out.println(s + " docs:" + docMap.get(s).size());
-		}
-
-		return instances;
-
-	}
 
 	private Hashtable<Integer, Topic> generateLabels(ParallelTopicModel model, int numTopics) {
 		Hashtable<Integer, Topic> ret = new Hashtable<Integer, Topic>();
@@ -800,13 +599,6 @@ public class FlowerPower {
 
 	public Hashtable<Integer, Topic> generateTopicModel() throws FlowerException {
 
-		String chunk = flower_dataset.equals(model_dataset) ? flower_dataset : flower_dataset + "_" + model_dataset;
-
-		File modelfile = new File(chunk + "_" + numtopics + ".dat");
-		if (modelcachedir != null) {
-			modelfile = new File(modelcachedir, chunk + "_" + numtopics + ".dat");
-		}
-
 		ArrayList<Pipe> pipeList = new ArrayList<Pipe>();
 		model = new ParallelTopicModel(numtopics, 1.0, 0.01);
 		// Pipes: lowercase, tokenize, remove stopwords, map to features
@@ -823,41 +615,34 @@ public class FlowerPower {
 
 		InstanceList instances = new InstanceList(new SerialPipes(pipeList));
 
-		try {
-if(databaselable.hasBackgroundKnowledge())
-{
-	databaselable.selectMainSet();
-	instances = fetchFromDB(instances, databaselable, false);
-	databaselable.selectBackgroundSet();
-	loadedinstances = fetchFromDB(instances, databaselable, true);
-
-}else
-{
-	databaselable.selectMainSet();
-	instances = loadedinstances = fetchFromDB(instances, databaselable, false);
 	
-	}
-					} catch (FowerReadException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
+		if(backgrounddir!=null)
+{
+instances=fetchFromDB(instances,new DataSource(backgrounddir),true);
+}
+		loadedinstances=instances=fetchFromDB(instances,new DataSource(inputdir),false);	
+	
+
+		
 		userphotocount_map = null;
 
 		// loadedinstances=instances;
 
 		System.out.println("serializing for future use");
 
-		if (modelfile.exists()) {
+		if ( usemodel&&modeloutputfile!=null) {
+			
 			try {
-				model = ParallelTopicModel.read(modelfile);
+				model = ParallelTopicModel.read(modeloutputfile);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			
 		} else {
 			model.addInstances(instances);
 			model.setNumThreads(numthreads);
-			model.setNumIterations(num_iterations);
+			model.setNumIterations(iternumnum);
 			try {
 				model.estimate();
 			} catch (IOException e) {
@@ -865,7 +650,8 @@ if(databaselable.hasBackgroundKnowledge())
 				e.printStackTrace();
 			}
 
-			model.write(modelfile);
+			if(modeloutputfile!=null)
+			model.write(this.modeloutputfile);
 		}
 		generateLabels(model, numtopics);
 
@@ -873,6 +659,87 @@ if(databaselable.hasBackgroundKnowledge())
 
 		return ret;
 	}
+
+	private InstanceList fetchInstances(InstanceList instances, File inputdir, boolean onlyinstances) throws FlowerException {
+
+		try {
+			DataSource dataset=new DataSource(inputdir);
+			System.out.println("Loading docs into instances");
+
+			while (dataset.hasNext()) {
+				DataRow rs=dataset.getRow();
+				String text = rs.getText();
+				if (text == "" || numOfWords(text) < 3)
+					continue;
+				String key = rs.getCategory();
+				String[] categories = key.trim().split(",");
+
+				for (String k : categories) {
+					if (!onlyinstances) {
+						ArrayList<DocMI> t = docMap.get(k);
+						if (t == null) {
+							t = new ArrayList<DocMI>();
+						}
+
+						t.add(new DocMI("" + rs.getDocid(), text, rs.getDocstrid()));
+						docMap.put(k, t);
+						Integer c = idCatCount.get("" + rs.getDocid());
+						if (c == null)
+							c = 0;
+						idCatCount.put("" + rs.getDocid(), ++c);
+					}
+					String str = rs.getDocid() + " news " + text;
+
+					Reader fileReader = new InputStreamReader(new ByteArrayInputStream(str.getBytes("UTF-8")), "UTF-8");
+					int curidx = instances.size();
+					instansids.put(curidx, rs.getDocstrid());
+					instances.addThruPipe(
+							new CsvIterator(fileReader, Pattern.compile("^(\\S*)[\\s,]*(\\S*)[\\s,]*(.*)$"), 3, 2, 1)); // data,
+																														// label,
+																														// name
+																														// fields
+				}
+
+			}
+			// System.out.println(comp+","+rec+","+talk);
+		}  catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (FowerReadException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		if(docMap.keySet().size()<2)
+		{
+			ArrayList<String> cats=new ArrayList<>();
+			for (String s : docMap.keySet()) 
+			{
+				cats.add("category: "+s+", count: "+docMap.get(s).size()+"\n");
+			}
+			
+			
+			throw new FlowerException("The application can not run with a single category in your source table: \n"+cats);
+		}
+		
+		if (!onlyinstances) {
+			System.out.println("Categories: " + docMap.keySet().size());
+			int c = 0;
+			for (String s : docMap.keySet()) {
+				categoryInt.put(s, c);
+				intCategory.put(c, s);
+				c++;
+				System.out.println(s + " docs:" + docMap.get(s).size());
+			}
+		}
+		return instances;
+
+	}
+
+
 
 	public int[] getCatarray() {
 		return catarray;
@@ -896,10 +763,6 @@ if(databaselable.hasBackgroundKnowledge())
 
 	public HashMap<String, ArrayList<TopicLink>> getCombiningTopics() {
 		return combiningTopics;
-	}
-
-	public String getDataset() {
-		return model_dataset;
 	}
 
 	public DiagramInput getDi() {
@@ -988,24 +851,6 @@ if(databaselable.hasBackgroundKnowledge())
 		return newInst;
 	}
 
-	public String getNounsFromSentence(String s, lemma lem) {
-		StringBuilder sb = new StringBuilder();
-		String t = lem.getSentenceLemmatizationWithPOS(s);
-		String[] pos = t.split("\\n");
-		if (t.isEmpty())
-			return null;
-		for (String k : pos) {
-			String[] wordpos = k.split("\\t");
-			if (wordpos[1].startsWith("n") && !wordpos[1].equalsIgnoreCase("nil")) {
-
-				sb.append(wordpos[2] + " ");
-			}
-
-		}
-
-		return new String(sb).trim();
-
-	}
 
 	public Integer getNumDocs(Integer cat) {
 		return mic.getCategoryDocumentsMap().get(cat).size();
@@ -1152,33 +997,7 @@ if(databaselable.hasBackgroundKnowledge())
 		docMap = null;
 	}
 
-	private HashMap<String, String> loadStopWordList() {
-		File file = new File("C:\\Users\\singh\\Desktop\\confstopwords.txt");
-		HashMap<String, String> wordlem = new HashMap<String, String>();
-		lemma lem = new lemma();
-		lem.init();
-		try {
-			FileReader reader = new FileReader(file);
-			BufferedReader br = new BufferedReader(reader);
-			String line;
-			while ((line = br.readLine()) != null) {
-				if (line.equals(""))
-					continue;
-				System.out.println(line.trim());
-				String lemword = lem.getLemmatization(line);
-				wordlem.put(line, lemword);
-			}
 
-		} catch (FileNotFoundException e) {
-
-			e.printStackTrace();
-		} catch (IOException e) {
-
-			e.printStackTrace();
-		}
-		return wordlem;
-
-	}
 
 	private int numOfWords(String string) {
 		int n = string.split(" ").length;
@@ -1279,11 +1098,6 @@ return sb.toString();
 	public void setCombiningTopics(HashMap<String, ArrayList<TopicLink>> combiningTopics) {
 		this.combiningTopics = combiningTopics;
 	};
-	// private ordering
-
-	public void setDataset(String dataset) {
-		this.model_dataset = dataset;
-	}
 
 	public void setDi(DiagramInput di) {
 		this.di = di;
@@ -1373,10 +1187,10 @@ return sb.toString();
 	}
 
 	public void storeModel() {
-		String chunk = flower_dataset.equals(model_dataset) ? flower_dataset : flower_dataset + "_" + model_dataset;
+	
 
-		File modelfile = new File(modelcachedir, chunk + "_" + numtopics + ".dat");
-		model.write(modelfile);
+	
+		model.write(modeloutputfile);
 	}
 
 	public int[] toIntArray(List<Integer> list) {

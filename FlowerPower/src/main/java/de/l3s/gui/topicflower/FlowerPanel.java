@@ -37,11 +37,11 @@ import sl.shapes.RegularPolygon;
 
 public class FlowerPanel extends JPanel {
 
-	private int CONNECTED_TOPIC_LENGTH = 5;
+	private int CONNECTED_TOPIC_LENGTH = 3;
 	private Flower flower;
-	int GENERAL_TOPIC_NUMBER = 5;
+	int GENERAL_TOPIC_NUMBER = 4;
 	Font font = null;
-	private double margin = 10;
+	private double margin =8;
 	Vector<VisualCategory> vcats;
 	Vector<VisualLink> vlinks;
 	private VisualCategory center;
