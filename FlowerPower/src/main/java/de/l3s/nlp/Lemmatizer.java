@@ -1,44 +1,122 @@
 package de.l3s.nlp;
 
+import java.io.StringReader;
+import java.text.BreakIterator;
+import java.util.Hashtable;
 import java.util.List;
+import java.util.Locale;
+import java.util.Vector;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-
+import edu.stanford.nlp.ling.CoreLabel;
+import edu.stanford.nlp.parser.lexparser.LexicalizedParser;
+import edu.stanford.nlp.process.CoreLabelTokenFactory;
+import edu.stanford.nlp.process.Morphology;
+import edu.stanford.nlp.process.PTBTokenizer;
+import edu.stanford.nlp.process.Tokenizer;
+import edu.stanford.nlp.process.TokenizerFactory;
+import edu.stanford.nlp.trees.Tree;
 
 public class Lemmatizer {
 
-	public List<Lemma> getLemma(String s, String langtoken) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	// private final static String PCG_MODEL = "edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz";        
 
-	/*
+	    private final TokenizerFactory<CoreLabel> tokenizerFactory = PTBTokenizer.factory(new CoreLabelTokenFactory(), "invertible=true");
+
+	   // private final LexicalizedParser parser = LexicalizedParser.loadModel(PCG_MODEL);
+public void init()
+{
+	
+}
+	    public Tree parse(LexicalizedParser parser, String str) { 
+	    	
+
+	    	
+	    	
+	    	
+	    	try{
+	        List<CoreLabel> tokens = tokenize(str);
+	        Tree tree = parser.apply(tokens);
+	        return tree;
+	    	}catch(Exception e)
+	    	{
+	    		System.out.println("problematic: "+str);
+	    	}
+	    	return null;
+	    }
+
+	    private List<CoreLabel> tokenize(String str) {
+	        Tokenizer<CoreLabel> tokenizer =
+	            tokenizerFactory.getTokenizer(
+	                new StringReader(str));    
+	        return tokenizer.tokenize();
+	    }
+
+	    
+	public static void main(String[] args) {
+		Lemmatizer lm=new Lemmatizer();
+			Vector<Lemma> lemms;
+			System.out.println(lemms=lm.getLemma("o I masturbated in class yesterday Yea imma nut on it and feed it to your mother  Don't get fucked up disrespecting my mother like that.. Better feed it to your father.. Oh wait you don't know who that it.. Suck my dick bitch Lol yo mad can't even spell right you in college right? Neither or can you  Que?", "en"));
+
+	for(Lemma l:lemms)
+	{
+		System.out.print(l.getLem()+"("+l.getTag()+")");
+	}
+	
+	}
 	public Vector<Lemma> getLemma(String s, String lang) {
 		
+		
+		
 		Vector<Lemma> res=new Vector<Lemma>();
-		if(lang.equals("de")){ res = makeGerman(s); }else if(lang.equals("en")){
+		if(lang.equals("de")){ 
+			
+			res = makeGerman(s); }else if(
+					lang.equals("en")){
 			res=makeEnglish(s);
 		}
 		return res;
 	}
 	private  Vector<Lemma> makeGerman(String text) {
-		return parseWith("models/german-dewac.tagger",text);
+		return parseWith("edu/stanford/nlp/models/lexparser/germanPCFG.ser.gz",text);
 		
 	}
 
 	private  Vector<Lemma> makeEnglish(String text) {
-		return parseWith(MaxentTagger.DEFAULT_DISTRIBUTION_PATH,text);
+		return parseWith("edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz",text);
 	}
 
-	Hashtable<String, MaxentTagger> models=new Hashtable<String, MaxentTagger>();
+	 Hashtable<String, LexicalizedParser> models=new Hashtable<String, LexicalizedParser>();
+	
 	private  Vector<Lemma> parseWith(String model, String text) {
 		Vector<Lemma> ret=new Vector<Lemma>();
+		if(text.trim().length()==0) return ret;
+		LexicalizedParser mt=loadParser(model);
+		 StringBuilder sb=new StringBuilder();
+    	BreakIterator iterator = BreakIterator.getSentenceInstance(Locale.US);
+    	String source = text+"";
+    	iterator.setText(source);
+    	int start = iterator.first();
+    	for (int end = iterator.next();
+    	    end != BreakIterator.DONE;
+    	    start = end, end = iterator.next()) {
+    	  text=source.substring(start,end);
+    	
 		
-		MaxentTagger mt=models.get(model);
-		if(mt==null)
-		{
-			models.put(model, mt=new MaxentTagger(model));
-		}
-		String output = mt.tagString(text);
+		
+		 Tree tree = parse(mt,text);  
+
+	        List<Tree> leaves = tree.getLeaves();
+	      
+	        for (Tree leaf : leaves) { 
+	            Tree parent = leaf.parent(tree);
+	           sb.append(leaf.label().value() + "_" + parent.label().value() + " ");
+	        }
+	        
+    	}
+    	
+		String output = sb.toString();
 		Morphology m=new Morphology();
 		String patternCapitalCaption = "(\\p{L}+)_([A-Za-z]+)";
 		Pattern pattern = Pattern.compile(patternCapitalCaption);
@@ -54,5 +132,16 @@ public class Lemmatizer {
 		}
 		
 		return ret;
-	}*/
+	}
+
+	public  synchronized LexicalizedParser loadParser(String model) {
+		LexicalizedParser mt = models.get(model);
+	if(mt==null)
+	{
+		models.put(model, mt=LexicalizedParser.loadModel(model));
+	}
+	return mt;
+	
+	}
+	
 }

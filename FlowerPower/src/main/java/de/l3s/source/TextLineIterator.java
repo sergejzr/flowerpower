@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Scanner;
 
-public class TextLineIterator implements Iterator<DBFileRow> {
+public class TextLineIterator implements Iterator<FileRow> {
 	Iterator<File> it;
 	Scanner scan;
 File curfile=null;
@@ -43,10 +43,11 @@ File curfile=null;
 		}
 
 	}
-int cnt=1;
+int cnt=0;
 	@Override
-	public DBFileRow next() {
-		return new DBFileRow(curfile.getParentFile().getName(),curfile.getName()+"_"+cnt,cnt+"",scan.nextLine());
+	public FileRow next() {
+		cnt++;
+		return new FileRow(curfile.getParentFile().getName(),curfile.getName()+"_"+cnt,cnt+"",scan.nextLine());
 		
 	}
 

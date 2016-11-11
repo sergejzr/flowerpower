@@ -35,7 +35,6 @@ import cc.mallet.types.IDSorter;
 import cc.mallet.types.Instance;
 import cc.mallet.types.InstanceList;
 import cc.mallet.types.LabelSequence;
-import de.l3s.db.DB;
 
 public class MalletModel {
 	
@@ -60,18 +59,7 @@ public class MalletModel {
 	{
 		model.write(f);
 	}
-	public static void main(String[] args) {
-		try {
-			
-			
-			test2();
-			int z=0;
-			z++;
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
+	public static void main(String[] args) {}
 	
 	
 	private InstanceList createInstanceList()
@@ -88,34 +76,7 @@ public class MalletModel {
         InstanceList instances = new InstanceList (new SerialPipes(pipeList));
         return instances;
 	}
-	private static void test2() throws Exception
-	{
 
-
-		MalletModel mm=new MalletModel(100,50);
-		
-        mm.fetchFromDBI("flower_wikimovies_nopersons");
-
-        // Create a model with 100 topics, alpha_t = 0.01, beta_w = 0.01
-        //  Note that the first parameter is passed as the sum over topics, while
-        //  the second is the parameter for a single dimension of the Dirichlet prior.
-       
-        mm.estimate();
-        
-
-
-        
-        mm.printem();
-        File modelf=new File("modtodelete");
-        mm.write(modelf);
-        
-        MalletModel mm2 = new MalletModel(modelf);
-        mm2.fetchFromDBI("flower_wikimovies_nopersons");
-       
-        System.out.println("reload");
-
-        mm2.printem();
-	}
 	public void estimate() throws IOException {
 		 model.addInstances(instances);
 		model.estimate();
@@ -240,56 +201,7 @@ return ret;
   return testProbabilities;
 	}
 	*/
-	private  InstanceList fetchFromDBI(String dataset) {
-		
-
-		try {
-			Connection dbcon;
-			
-			
-			 dbcon = DB.getConnection("jdbc:mysql://mysql.l3s.uni-hannover.de?characterEncoding=utf8","flickrattractive");
-			
-			PreparedStatement pstmt= dbcon.prepareStatement("SELECT * FROM `"+dataset+"` WHERE 1");
-			ResultSet rs = pstmt.executeQuery();
-			 
-	        System.out.println("Loading docs into instances");
-	        
-	        while(rs.next())
-			{
-	        	String text=rs.getString("lem_nouns");
-if(text.trim().split(" ").length<2){continue;}
-
-        		String key= rs.getString("category");
-        		String[] categories = key.trim().split(",");
-        		
-        		for(String k: categories)
-        		{
-    	        	String str = rs.getInt("id")+" news "+text;
-    	        
-    		       addTrainingInstance(str);
-        		}
-        			
-			}
-	        rs.close();
-	        //System.out.println(comp+","+rec+","+talk);
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	
-		 return instances;
-		
-
-	}
 	Pattern pattern = Pattern.compile("^(\\S*)[\\s,]*(\\S*)[\\s,]*(.*)$");
 	public  void addTrainingInstance(String str) throws UnsupportedEncodingException { 
 		Reader fileReader = new InputStreamReader(new ByteArrayInputStream(str.getBytes("UTF-8")),"UTF-8");
