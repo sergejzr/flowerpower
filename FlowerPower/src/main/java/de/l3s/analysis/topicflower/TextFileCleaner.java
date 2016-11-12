@@ -124,8 +124,9 @@ public class TextFileCleaner {
 		Path inpath = Paths.get(indir);
 		Path outpath = Paths.get(outdir);
 
+		Path walkpath=inpath;
 		try {
-			Files.walkFileTree(inpath, new SimpleFileVisitor<Path>() {
+			Files.walkFileTree(walkpath, new SimpleFileVisitor<Path>() {
 				@Override
 				public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
 
@@ -136,6 +137,8 @@ public class TextFileCleaner {
 					Path rel = inpath.relativize(file);
 					Path newpath = outpath.resolve(rel);
 					newpath.toFile().getParentFile().mkdirs();
+					
+					if(newpath.toFile().exists()){return FileVisitResult.CONTINUE;}
 					lemmatizeParallel(file.toFile(), new File(newpath.toFile().toString()+"_TMP"));
 					return FileVisitResult.CONTINUE;
 				}
@@ -143,6 +146,8 @@ public class TextFileCleaner {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+System.out.println("Preprocessing done");
+
 
 	
 	
@@ -151,6 +156,8 @@ public class TextFileCleaner {
 	public void lemmatizeParallel(File in, File out) {
 		// lemma lem= new lemma();
 		// lem.init();
+		
+		
 		try {
 			FileReader fr = new FileReader(in);
 			FileWriter fw = new FileWriter(out);
@@ -166,7 +173,7 @@ public class TextFileCleaner {
 				Stack<Integer> towork = new Stack<Integer>();
 				List<LemmatizeThread> myworkers = new ArrayList<LemmatizeThread>();
 
-				ExecutorService executor = Executors.newFixedThreadPool(15);
+				ExecutorService executor = Executors.newFixedThreadPool(numthreads);
 
 				int batchsize = 100;
 				while (batchsize-- > 0 && (line = br.readLine()) != null) {
@@ -199,15 +206,16 @@ public class TextFileCleaner {
 						if (lemmatized_nouns.trim().length() == 0) {
 							continue;
 						}
+						
 						fw.write(lemmatized_nouns);
 						fw.write("\n");
 
 					}
 				}
 				myworkers = new ArrayList<>();
-				System.out.println(cnt);
+				System.out.print(cnt);
 
-				System.out.println("done");
+				System.out.println(" done");
 
 			} while (line != null);
 
