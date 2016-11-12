@@ -1,5 +1,10 @@
 package de.l3s.topicmodelling;
 
+/**
+ * key value pair
+ * @author zerr
+ *
+ */
 public class ScoredTopics implements Comparable<ScoredTopics>{
 int topicid;
 double score;

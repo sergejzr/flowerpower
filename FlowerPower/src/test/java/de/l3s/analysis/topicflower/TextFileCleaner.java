@@ -5,8 +5,16 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Stack;
 import java.util.concurrent.ExecutorService;
@@ -19,43 +27,36 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.io.FileUtils;
 
 import de.l3s.nlp.LemmatizeThread;
 
 public class TextFileCleaner {
-	File in;
-	File out;
-	String langtoken;
+
 	int numthreads;
-	String[] poss;
 	private boolean stemm;
 	private String[] stopwords;
 	private Options options;
+	private String indir;
+	private String outdir;
+	private String lang;
+	private String[] poslist;
 
-	public void init(File in, File out, String langtoken, int numthreads, String[] poss, boolean stemm,
-			String[] stopwords) {
-
-		this.in = in;
-		this.out = out;
-		this.langtoken = langtoken;
-		this.numthreads = numthreads;
-		this.poss = poss;
-		this.stemm = stemm;
-		this.stopwords = stopwords;
-	}
+	
 
 	public TextFileCleaner(String[] args) {
 		options = new Options();
 		// add t option
 
-		options.addOption(Option.builder().longOpt("infile").hasArg(true).desc("file to read").numberOfArgs(1)
-				.argName("filepath").required().build());
-		options.addOption(Option.builder().longOpt("outfile").hasArg(true).desc("file to write").numberOfArgs(1)
-				.argName("filepath").required().build());
-		options.addOption(Option.builder().longOpt("lang").hasArg().desc("file to write").numberOfArgs(1)
-				.argName("language of the text files").required(false).build());
-		options.addOption(Option.builder().longOpt("numthreads").hasArg().desc("file to write").numberOfArgs(1)
-				.argName("number of thread to use").required(false).build());
+		options.addOption(Option.builder().longOpt("indir").hasArg(false).desc("a directory to read").numberOfArgs(1)
+				.argName("path").required().build());
+		options.addOption(Option.builder().longOpt("outdir").hasArg(false)
+				.desc("a directory to write (will be created if not exists)").numberOfArgs(1).argName("path").required()
+				.build());
+		options.addOption(Option.builder().longOpt("lang").hasArg().desc("language of the text files").numberOfArgs(1)
+				.argName("").required(false).build());
+		options.addOption(Option.builder().longOpt("numthreads").hasArg().desc("number of thread to use")
+				.numberOfArgs(1).argName("").required(false).build());
 		options.addOption(
 				Option.builder().longOpt("pos").hasArg(true).desc("comma separated list of part of speech tags to keep")
 						.numberOfArgs(1).argName("poslist").valueSeparator(',').required(false).build());
@@ -66,10 +67,13 @@ public class TextFileCleaner {
 		try {
 			CommandLine cmd = parser.parse(options, args);
 
+			indir = cmd.getOptionValue("indir");
+			outdir = cmd.getOptionValue("outdir");
+
 			String infile = cmd.getOptionValue("infile");
 			String outfile = cmd.getOptionValue("outfile");
-			String lang = cmd.getOptionValue("lang", "en");
-			int numthreads = 1;
+			 lang = cmd.getOptionValue("lang", "en");
+			 numthreads = 1;
 			String numthreadsstr = cmd.getOptionValue("numthreads", "1");
 			try {
 				numthreads = Integer.parseInt(numthreadsstr);
@@ -79,25 +83,25 @@ public class TextFileCleaner {
 			}
 
 			String posliststr = cmd.getOptionValue("poslist", "F,J,N,R,U,V");
-			String[] poslist;
+		
 			try {
-				poslist = posliststr.split(",");
+				this.poslist = posliststr.split(",");
 			} catch (Exception e) {
 				throw new ParseException("argument" + posliststr + " is not correct for the option --poslist");
 			}
 			String stemstr = cmd.getOptionValue("stem", "false");
-			boolean stem;
-			stem = stemstr.equals("true");
+		
+			this.stemm = stemstr.equals("true");
 
 			String stopliststr = cmd.getOptionValue("stoplist", "");
-			String[] stoplist;
+		
 			try {
-				stoplist = stopliststr.split(",");
+				this.stopwords = stopliststr.split(",");
 			} catch (Exception e) {
 				throw new ParseException("argument" + stopliststr + " is not correct for the option --stoplist");
 			}
 
-			init(new File(infile), new File(outfile), langtoken, numthreads, poslist, stem, stopwords);
+		
 
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
@@ -106,7 +110,7 @@ public class TextFileCleaner {
 			System.err.println(e.getMessage());
 			formatter.printHelp("java -cp FlowerPower.jar " + this.getClass().getCanonicalName().trim() + " [OPTIONS]",
 					options);
-			return;
+			System.exit(1);
 		}
 
 	}
@@ -115,7 +119,36 @@ public class TextFileCleaner {
 		// TODO Auto-generated constructor stub
 	}
 
-	public void lemmatizeParallel() {
+	public void run() {
+
+		Path inpath = Paths.get(indir);
+		Path outpath = Paths.get(outdir);
+
+		try {
+			Files.walkFileTree(inpath, new SimpleFileVisitor<Path>() {
+				@Override
+				public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+
+					if (attrs.isDirectory() || !file.toString().endsWith("tsv")) {
+						return FileVisitResult.CONTINUE;
+					}
+
+					Path rel = inpath.relativize(file);
+					Path newpath = outpath.resolve(rel);
+					newpath.toFile().getParentFile().mkdirs();
+					lemmatizeParallel(file.toFile(), new File(newpath.toFile().toString()+"_TMP"));
+					return FileVisitResult.CONTINUE;
+				}
+			});
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	
+	
+	}
+
+	public void lemmatizeParallel(File in, File out) {
 		// lemma lem= new lemma();
 		// lem.init();
 		try {
@@ -145,7 +178,7 @@ public class TextFileCleaner {
 
 				for (int i = 0; i < numthreads; i++) {
 					LemmatizeThread t;
-					executor.execute(t = new LemmatizeThread(origidx, towork, langtoken, poss, stemm, stopwords));
+					executor.execute(t = new LemmatizeThread(origidx, towork, this.lang, poslist, stemm, stopwords));
 					myworkers.add(t);
 				}
 
@@ -188,15 +221,21 @@ public class TextFileCleaner {
 	}
 
 	public static void main(String[] args) {
-		TextFileCleaner tc1 = new TextFileCleaner(args);
-
-		File dir = new File("/media/zerr/BA0E0E3E0E0DF3E3/yak/yaktexts/west/");
-		TextFileCleaner tc = new TextFileCleaner();
-		tc.init(new File(dir, "StateYaksDocuments_AK.tsv"), new File(dir, "clean_StateYaksDocuments_AK.tsv"), "en", 5,
-				new String[] { "F", "J", "N", "R", "U", "V" }, true, null);
-		tc.lemmatizeParallel();
-
-		System.out.println(LemmatizeThread.garbage);
+		TextFileCleaner tc1 = new TextFileCleaner(
+				("--indir /media/zerr/BA0E0E3E0E0DF3E3/yak/yaktexts/ --outdir /media/zerr/BA0E0E3E0E0DF3E3/yak/yakcleantextx "
+				+ "--numthreads 30")
+						.split("\\s+"));
+		tc1.run();
+		/*
+		 * File dir = new
+		 * File("/media/zerr/BA0E0E3E0E0DF3E3/yak/yaktexts/west/");
+		 * TextFileCleaner tc = new TextFileCleaner(); tc.init(new File(dir,
+		 * "StateYaksDocuments_AK.tsv"), new File(dir,
+		 * "clean_StateYaksDocuments_AK.tsv"), "en", 5, new String[] { "F", "J",
+		 * "N", "R", "U", "V" }, true, null); tc.lemmatizeParallel();
+		 * 
+		 * System.out.println(LemmatizeThread.garbage);
+		 */
 	}
 
 }

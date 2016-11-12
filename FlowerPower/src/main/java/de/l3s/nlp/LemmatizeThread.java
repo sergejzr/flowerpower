@@ -43,7 +43,7 @@ public class LemmatizeThread implements Runnable {
 		if (stopwords == null) {
 			this.stopwords = null;
 		} else {
-
+			this.stopwords=new HashSet<>();
 			this.stopwords.addAll(Arrays.asList(stopwords));
 		}
 	}
