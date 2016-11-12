@@ -221,10 +221,14 @@ public class TextFileCleaner {
 	}
 
 	public static void main(String[] args) {
+		if(args.length==0)
+		{
+			args=("--indir /media/zerr/BA0E0E3E0E0DF3E3/yak/yaktexts/ --outdir /media/zerr/BA0E0E3E0E0DF3E3/yak/yakcleantextx "
+					+ "--numthreads 30").split("\\s+");
+		}
 		TextFileCleaner tc1 = new TextFileCleaner(
-				("--indir /media/zerr/BA0E0E3E0E0DF3E3/yak/yaktexts/ --outdir /media/zerr/BA0E0E3E0E0DF3E3/yak/yakcleantextx "
-				+ "--numthreads 30")
-						.split("\\s+"));
+				args
+						);
 		tc1.run();
 		/*
 		 * File dir = new
