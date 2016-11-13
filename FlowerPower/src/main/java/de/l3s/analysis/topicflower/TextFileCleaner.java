@@ -138,8 +138,9 @@ public class TextFileCleaner {
 					Path newpath = outpath.resolve(rel);
 					newpath.toFile().getParentFile().mkdirs();
 					
-					if(newpath.toFile().exists()){return FileVisitResult.CONTINUE;}
-					lemmatizeParallel(file.toFile(), new File(newpath.toFile().toString()+"_TMP"));
+					File targetfile = new File(newpath.toFile().toString()+"_TMP");
+					if(targetfile.exists()){return FileVisitResult.CONTINUE;}
+					lemmatizeParallel(file.toFile(), targetfile);
 					return FileVisitResult.CONTINUE;
 				}
 			});
