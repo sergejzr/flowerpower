@@ -2,12 +2,14 @@ package de.l3s.nlp;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Stack;
+import java.util.Vector;
 
 import org.apache.lucene.analysis.LowerCaseFilter;
 import org.apache.lucene.analysis.StopFilter;
@@ -107,7 +109,17 @@ public class LemmatizeThread implements Runnable {
 	String getNouns(String s, de.l3s.nlp.Lemmatizer mylem, String langtoken) {
 
 		StringBuilder sb = new StringBuilder();
-		List<Lemma> res = mylem.getLemma(s, langtoken);
+		
+		ArrayList<Lemma> res=new ArrayList<>();
+		for(String st:s.split("\\."))
+		{
+			Vector<Lemma> res2 = mylem.getLemma(st, langtoken);
+			if(res2!=null)
+			{
+				res.addAll(res2);
+			}
+		}
+		
 
 		if (res.isEmpty())
 			return "";
