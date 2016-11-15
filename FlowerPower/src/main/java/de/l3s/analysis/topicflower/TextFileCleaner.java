@@ -108,7 +108,7 @@ public class TextFileCleaner {
 
 			HelpFormatter formatter = new HelpFormatter();
 			System.err.println(e.getMessage());
-			formatter.printHelp("java -cp FlowerPower.jar " + this.getClass().getCanonicalName().trim() + " [OPTIONS]",
+			formatter.printHelp("java -cp "+Tool.jarName(this)+" " + this.getClass().getCanonicalName().trim() + " [OPTIONS]",
 					options);
 			System.exit(1);
 		}

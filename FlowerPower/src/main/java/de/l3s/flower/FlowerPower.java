@@ -146,9 +146,10 @@ public class FlowerPower {
 	private boolean usemodel;
 	private File modeloutputfile;
 	private int iternumnum;
+	private HashSet stoppwords;
 
 	public FlowerPower(int numtopics, int nr_topics_for_instance, File inputdir, File backgrounddir, int ldathreadsnum,
-			int iternumnum, boolean usemodel, File modeloutputfile) {
+			int iternumnum, boolean usemodel, File modeloutputfile, String[] stoppwords) {
 
 		this.numtopics = numtopics;
 		this.nr_topics_for_instance = nr_topics_for_instance;
@@ -158,6 +159,7 @@ public class FlowerPower {
 		this.numthreads = ldathreadsnum;
 		this.usemodel = usemodel;
 		this.modeloutputfile = modeloutputfile;
+		this.stoppwords=new HashSet<>(Arrays.asList(stoppwords));
 
 		categoryRepMap = new HashMap<String, ArrayList<TopicLink>>();
 		top5 = new ArrayList<String>();
@@ -464,8 +466,10 @@ public class FlowerPower {
 			while (dataset.hasNext()) {
 				DataRow rs = dataset.getRow();
 				String text = rs.getText();
-				if (text == "" || numOfWords(text) < 3)
+				text=removeStoppWords(text);
+				if (text == "" || numOfWords(text) < 2)
 					continue;
+				
 				String key = rs.getCategory();
 				String[] categories = key.trim().split(",");
 
@@ -530,6 +534,17 @@ public class FlowerPower {
 		}
 		return instances;
 
+	}
+
+	private String removeStoppWords(String text) {
+		StringBuilder sb=new StringBuilder();
+		for(String s:text.split("\\s+"))
+		{
+			if(stoppwords.contains(s)){continue;}
+			if(sb.length()>0){}sb.append(" ");
+			sb.append("s");
+		}
+		return sb.toString();
 	}
 
 	private Hashtable<Integer, Topic> generateLabels(ParallelTopicModel model, int numTopics) {

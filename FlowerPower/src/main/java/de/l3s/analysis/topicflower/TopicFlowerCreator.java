@@ -66,6 +66,7 @@ public class TopicFlowerCreator {
 	private Options options;
 	private int top;
 	private File inputdir;
+	private String[] stoppwords;
 
 	public TopicFlowerCreator() {
 
@@ -91,6 +92,11 @@ public class TopicFlowerCreator {
 
 		options.addOption(Option.builder().longOpt("usestructure")
 				.desc("A flower structure file will be re-used, if exisis. ").required(false).build());
+		
+		
+		options.addOption(Option.builder().longOpt("stoppwords").hasArg()
+				.desc("A comma separated list of stopwords").required(false).build());
+		
 		options.addOption(Option.builder().longOpt("usemodel")
 				.desc("A topic model file will be re-used, if exisis. (Will be ignored if usestructure is specified and structure xml file exists)")
 				.required(false).build());
@@ -141,6 +147,10 @@ public class TopicFlowerCreator {
 			}
 		}
 		// File tmp = new File("tmp");
+		 String stoppwordsstr = cmd.getOptionValue("stoppwords", "");
+		
+		 stoppwords=stoppwordsstr.split(",");
+		
 		String ldamodelfilestr = cmd.getOptionValue("ldamodelfile", null);
 		if (ldamodelfilestr != null) {
 			ldamodelfile = new File(ldamodelfilestr);
@@ -297,7 +307,7 @@ public class TopicFlowerCreator {
 
 		//
 		TopicFlowerCreator tf = new TopicFlowerCreator();
-		String arguments = "--inputdir /home/zerr/Dropbox/us/Flowerinput/ --k 150 --ldathreadnum 2 --iternum 100 --top 3 "
+		String arguments = "--inputdir /home/zerr/Dropbox/us/Flowerinput/ --stoppwords lol,haha --k 150 --ldathreadnum 2 --iternum 100 --top 3 "
 				+ "--ldamodelfile tmp/model.mdl --structureoutput tmp/flower.xml "
 				+ "--petalorder natural --tcenter 5:5 --tconnect 3:3 --tpetal 4:4 --format png --floweroutput test.png";
 
@@ -330,7 +340,7 @@ public class TopicFlowerCreator {
 
 			HelpFormatter formatter = new HelpFormatter();
 			System.err.println(e.getMessage());
-			formatter.printHelp("java -cp FlowerPower.jar " + getClass().getCanonicalName().trim() + " [OPTIONS]",
+			formatter.printHelp("java -cp "+Tool.jarName(this)+" " + getClass().getCanonicalName().trim() + " [OPTIONS]",
 					options);
 			return;
 		}
@@ -474,7 +484,7 @@ public class TopicFlowerCreator {
 	private Flower createFlower() throws FlowerException {
 
 		FlowerPower topicFlower = new FlowerPower(this.k, this.top, this.inputdir, this.backgrounddir,
-				this.ldathreadsnum, this.iternumnum, this.usemodel, this.ldamodelfile);// "table_name",
+				this.ldathreadsnum, this.iternumnum, this.usemodel, this.ldamodelfile,stoppwords);// "table_name",
 		// number
 		// of
 		// topics
