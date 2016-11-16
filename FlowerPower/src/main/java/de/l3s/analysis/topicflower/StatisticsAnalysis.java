@@ -41,7 +41,7 @@ public class StatisticsAnalysis {
 				.argName("path").required().build());
 		
 		options.addOption(Option.builder().longOpt("tradeoff").hasArg(true)
-				.desc("a parameter between [0,1]. 0 - prefer high term frequency, 1-prefer even distribution among categories. Default value: 0.05 ").required()
+				.desc("a parameter between [0,1]. 0 - prefer high term frequency, 1-prefer even distribution among categories. Default value: 0.01 ").required()
 				.build());
 		options.addOption(Option.builder().longOpt("k").hasArg(true)
 				.desc("The length of the stoppword candidate list").required()
@@ -138,10 +138,11 @@ public class StatisticsAnalysis {
 
 	public static void main(String[] args) {
 		
-		
-		String argstr = "--indir /media/zerr/BA0E0E3E0E0DF3E3/yaktextscleaned/regions/ --tradeoff 0.05 --k 100";
-		
-		StatisticsAnalysis a = new StatisticsAnalysis(argstr.split("\\s+"));
+		if(args.length==1&&args[0].equals("--test")){
+		String argstr = "--indir /media/zerr/BA0E0E3E0E0DF3E3/yaktextscleaned/regions/ --tradeoff 0.01 --k 100";
+		args=argstr.split("\\s+");
+		}
+		StatisticsAnalysis a = new StatisticsAnalysis(args);
 		
 		a.printTopK();
 		//a.doeExperiment();

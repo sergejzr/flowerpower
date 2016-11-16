@@ -307,6 +307,7 @@ public class TopicFlowerCreator {
 
 		//
 		TopicFlowerCreator tf = new TopicFlowerCreator();
+		if(args.length==1&&args[0].equals("--test")){
 		String arguments = "--inputdir /home/zerr/Dropbox/us/Flowerinput/ --stoppwords lol,haha --k 150 --ldathreadnum 2 --iternum 100 --top 3 "
 				+ "--ldamodelfile tmp/model.mdl --structureoutput tmp/flower.xml "
 				+ "--petalorder natural --tcenter 5:5 --tconnect 3:3 --tpetal 4:4 --format png --floweroutput test.png";
@@ -319,9 +320,10 @@ public class TopicFlowerCreator {
 				+ "--petalorder natural --tcenter 5:5 --tconnect 3:3 --tpetal 4:4 --format png --floweroutput cntteststructreusemodel.png";
 		arguments = "--usestructure " + "--structureoutput tmp/flower.xml "
 				+ "--petalorder natural --tcenter 5:5 --tconnect 3:3 --tpetal 4:4 --format html --floweroutput cntteststructreusemodel.html";
-
+		args=arguments.split("\\s+");
+		}
 		try {
-			tf.runCreation(arguments.split("\\s+"));
+			tf.runCreation(args);
 		} catch (FlowerException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

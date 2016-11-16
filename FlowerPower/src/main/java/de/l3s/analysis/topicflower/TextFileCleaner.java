@@ -230,10 +230,12 @@ System.out.println("Preprocessing done");
 	}
 
 	public static void main(String[] args) {
-		if(args.length==0)
+		
+		if(args.length==1&&args[0].equals("--test")){
 		{
 			args=("--indir /media/zerr/BA0E0E3E0E0DF3E3/yak/yaktexts/ --outdir /media/zerr/BA0E0E3E0E0DF3E3/yak/yakcleantextx "
 					+ "--numthreads 30").split("\\s+");
+		}
 		}
 		TextFileCleaner tc1 = new TextFileCleaner(
 				args
