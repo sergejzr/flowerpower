@@ -159,7 +159,7 @@ public class TopicFlowerCreator {
 				throw new ParseException("The optional argument 'ldamodelfile' shoud be a file name");
 			}
 			if (!ldamodelfile.getAbsoluteFile().getParentFile().exists()) {
-				throw new ParseException("WIll not be able to write the model, directory does not exist: "
+				throw new ParseException("Will not be able to write the model, directory does not exist: "
 						+ ldamodelfile.getAbsoluteFile().getParentFile());
 
 			}
@@ -308,11 +308,8 @@ public class TopicFlowerCreator {
 		//
 		TopicFlowerCreator tf = new TopicFlowerCreator();
 		if(args.length==1&&args[0].equals("--test")){
-		String arguments = "--inputdir /home/zerr/Dropbox/us/Flowerinput/ --stoppwords lol,haha --k 150 --ldathreadnum 2 --iternum 100 --top 3 "
-				+ "--ldamodelfile tmp/model.mdl --structureoutput tmp/flower.xml "
-				+ "--petalorder natural --tcenter 5:5 --tconnect 3:3 --tpetal 4:4 --format png --floweroutput test.png";
-
-		arguments = "--inputdir /home/zerr/Dropbox/us/Flowerinput/ --usemodel "
+	
+			String arguments = "--inputdir /home/zerr/Dropbox/us/Flowerinput/ --usemodel "
 				+ "--ldamodelfile tmp/model.mdl --structureoutput tmp/flower.xml "
 				+ "--petalorder natural --tcenter 5:5 --tconnect 3:3 --tpetal 4:4 --format png --floweroutput test2reusemodel.png";
 
@@ -320,6 +317,10 @@ public class TopicFlowerCreator {
 				+ "--petalorder natural --tcenter 5:5 --tconnect 3:3 --tpetal 4:4 --format png --floweroutput cntteststructreusemodel.png";
 		arguments = "--usestructure " + "--structureoutput tmp/flower.xml "
 				+ "--petalorder natural --tcenter 5:5 --tconnect 3:3 --tpetal 4:4 --format html --floweroutput cntteststructreusemodel.html";
+		 arguments = "--inputdir /home/zerr/Dropbox/us/Flowerinput/ --stoppwords lol,haha --k 150 --ldathreadnum 2 --iternum 100 --top 3 "
+				+ "--ldamodelfile tmp/model.mdl --structureoutput tmp/flower.xml "
+				+ "--petalorder natural --tcenter 5:5 --tconnect 3:3 --tpetal 4:4 --format png --floweroutput test.png";
+
 		args=arguments.split("\\s+");
 		}
 		try {

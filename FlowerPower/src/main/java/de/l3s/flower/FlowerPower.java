@@ -542,7 +542,7 @@ public class FlowerPower {
 		{
 			if(stoppwords.contains(s)){continue;}
 			if(sb.length()>0){}sb.append(" ");
-			sb.append("s");
+			sb.append(s);
 		}
 		return sb.toString();
 	}
