@@ -19,6 +19,9 @@ import java.util.Locale;
 import java.util.TreeSet;
 import java.util.Vector;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import cc.mallet.pipe.Pipe;
 import cc.mallet.topics.ParallelTopicModel;
 import cc.mallet.types.Alphabet;
@@ -286,98 +289,11 @@ public class MIselection {
 		}
 	}
 
-	public static void test1() {
 
-		try {
-			// TODO:
-			Connection con = null;// getyourconnection
-			PreparedStatement st = con
-					.prepareStatement("SELECT t.photoid,t.value FROM XXXXXXX");
+	private Logger log() {
 
-			ResultSet posset = st.executeQuery();
-
-			ArrayList positiveList = new ArrayList();
-
-			String pid = "";
-			Terms terms1pos = null;
-			ArrayList photo1pos = null;
-			while (posset.next()) {
-				String photoid = posset.getString("photoid");
-
-				if (pid.compareTo(photoid) != 0) {
-					if (photo1pos != null) {
-						positiveList.add(terms1pos);
-					}
-					pid = photoid;
-					photo1pos = new ArrayList();
-					terms1pos = new Terms(photo1pos);
-				}
-
-				photo1pos.add(new TermPos(posset.getString("value"), 0));
-				if (posset.isLast()) {
-					positiveList.add(terms1pos);
-				}
-			}
-
-			ArrayList negativeList = new ArrayList();
-
-			st = con.prepareStatement("SELECT t.photoid,t.value FROM `sample_privacy_info` i JOIN sample_tag t ON (i.photoid=t.photoid) WHERE i.isPrivate='yes' ORDER BY t.photoid ");
-
-			posset = st.executeQuery();
-
-			pid = "";
-			terms1pos = null;
-			photo1pos = null;
-			while (posset.next()) {
-				String photoid = posset.getString("photoid");
-
-				if (pid.compareTo(photoid) != 0) {
-					if (photo1pos != null) {
-						negativeList.add(terms1pos);
-					}
-					pid = photoid;
-					photo1pos = new ArrayList();
-					terms1pos = new Terms(photo1pos);
-				}
-
-				photo1pos.add(new TermPos(posset.getString("value"), 0));
-				if (posset.isLast()) {
-					negativeList.add(terms1pos);
-				}
-			}
-
-			MIselection mi = new MIselection(positiveList, negativeList);
-			mi.computePositiveAndNegativeMIvalues();
-			System.out.println("mi.getTopNposResults(20) "
-					+ mi.getTopNposResults(20));
-			System.out.println("mi.getTopNnegResults(20) "
-					+ mi.getTopNnegResults(20));
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		System.out.println("ready");
-		/*
-		 * ArrayList positiveList =
-		 * NewsBase.getAllTermsList(NewsBase.getIDList("sci.med", 0 , 1000));
-		 * ArrayList negativeList =
-		 * NewsBase.getAllTermsList(NewsBase.getIDList("sci.space", 0 , 1000));
-		 * System.out.println("Berechnung ...."); MIselection msel = new
-		 * MIselection(positiveList, negativeList);
-		 * msel.computePositiveAndNegativeMIvalues();
-		 * System.out.println(msel.getTopNposResults(10));
-		 * System.out.println("***************************************");
-		 * System.out.println(msel.getTopNnegResults(10)); for (int i = 0; i <
-		 * 100; i++) {
-		 * System.out.println(((TermMI)msel.posResultList.get(i)).term + " = " +
-		 * ((TermMI)msel.posResultList.get(i)).value); }
-		 * System.out.println("================================"); for (int i =
-		 * 0; i < 100; i++) {
-		 * System.out.println(((TermMI)msel.negResultList.get(i)).term + " = " +
-		 * ((TermMI)msel.negResultList.get(i)).value); }
-		 */
-
+		return LoggerFactory.getLogger(this.getClass());
 	}
-
 	public static Hashtable<listtype, Collection<String>> selectFeatures(
 			int number, Connection con, String sql, String[] stopwords) {
 		Hashtable<listtype, Collection<String>> ret = new Hashtable<listtype, Collection<String>>();

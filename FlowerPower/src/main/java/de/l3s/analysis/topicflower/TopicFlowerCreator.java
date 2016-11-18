@@ -67,6 +67,7 @@ public class TopicFlowerCreator {
 	private int top;
 	private File inputdir;
 	private String[] stoppwords;
+	private String configuration;
 
 	public TopicFlowerCreator() {
 
@@ -335,6 +336,7 @@ public class TopicFlowerCreator {
 
 	public void runCreation(String[] args) throws FlowerException {
 
+		this.configuration=String.join(" ", args);
 		DefaultParser parser = new DefaultParser();
 		try {
 			readOptions(parser.parse(options, args));
@@ -352,6 +354,7 @@ public class TopicFlowerCreator {
 		if (!usestructure || structureoutputfile == null) {
 			// FlowerCreator fc = new FlowerCreator(k);
 			f = createFlower();
+			f.setConfiguration(this.configuration);
 			log().info("JAXB-FLOWER");
 			log().info("JAXB-FLOWER");
 
@@ -699,7 +702,7 @@ public class TopicFlowerCreator {
 	}
 
 	private Logger log() {
-		// TODO Auto-generated method stub
+
 		return LoggerFactory.getLogger(this.getClass());
 	}
 
@@ -766,7 +769,7 @@ public class TopicFlowerCreator {
 
 		sb.append("</td><tr>\n");
 		sb.append("</tr></table>");
-		// System.out.println(sb);
+
 
 		try {
 			FileWriter fw = new FileWriter(this.floweroutputfile);

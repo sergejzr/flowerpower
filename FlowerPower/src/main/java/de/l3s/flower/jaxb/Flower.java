@@ -68,6 +68,8 @@ public class Flower {
 	protected General general;
 	@XmlElement(name = "instances", required = true)
 	protected Instances instances;
+	@XmlElement(name = "configuration", required = true)
+	protected String configuration;
 
 	public Instances getInstances() {
 		return instances;
@@ -416,5 +418,12 @@ Hashtable<Integer, Term> termidx=null;
 	{
 		return label(getTopicById(t.getTid()),k);
 	
+	}
+	public void setConfiguration(String configuration) {
+		
+		this.configuration=configuration;
+	}
+	public String getConfiguration() {
+		return configuration;
 	}
 }

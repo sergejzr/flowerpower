@@ -24,6 +24,9 @@ import java.util.TreeSet;
 import java.util.Vector;
 import java.util.regex.Pattern;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import cc.mallet.pipe.CharSequence2TokenSequence;
 import cc.mallet.pipe.CharSequenceLowercase;
 import cc.mallet.pipe.Pipe;
@@ -50,7 +53,7 @@ import de.l3s.source.DataRow;
 import de.l3s.source.DataSource;
 import de.l3s.source.FowerReadException;
 
-//import meta.dbaccess.*; 
+//import meta.dbaccess.*; (
 //import meta.dbinterfaces.*; 
 
 //import weka.core.*; 
@@ -168,7 +171,10 @@ public class FlowerPower {
 		labels = new HashMap<String, String>();
 		categoryInt = new HashMap<String, Integer>();
 	}
+	private Logger log() {
 
+		return LoggerFactory.getLogger(this.getClass());
+	}
 	public Hashtable<Integer, Topic> applyTopicModel(File modelfile) throws FlowerException {
 
 		ArrayList<Pipe> pipeList = new ArrayList<Pipe>();
@@ -192,10 +198,11 @@ public class FlowerPower {
 		userphotocount_map = null;
 		loadedinstances = instances;
 
-		System.out.println("serializing for future use");
+		
 
 		if (modelfile.exists()) {
 			try {
+				log().info("reuse existing topic model "+modelfile);
 				model = ParallelTopicModel.read(modelfile);
 				numtopics = model.getNumTopics();
 			} catch (Exception e) {
@@ -203,6 +210,7 @@ public class FlowerPower {
 				e.printStackTrace();
 			}
 		} else {
+			log().info("compute LDA model");
 			model.addInstances(instances);
 			model.setNumThreads(this.numthreads);
 			model.setNumIterations(this.iternumnum);
@@ -212,7 +220,7 @@ public class FlowerPower {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-
+log().info("Store LDA model for future use in "+modelfile);
 			model.write(modelfile);
 		}
 		generateLabels(model, numtopics);
@@ -238,12 +246,13 @@ public class FlowerPower {
 	}
 
 	private List<Integer> calculateOptimalOrderingJaccard(List<Integer> categories) {
-		System.out.println("building score index");
+		log().info("building category similarity score index");
 		buildScoreIndex();
-		System.out.println("computing ordering");
+		log().info("computing ordering as "+this.ordering);
 		switch (this.ordering) {
 		case optimalOrderung:
 			permute(categories, 0);
+			log().info("avg pairwise jaccard score=" + scoremin);
 			break;
 		case naturalOrdering:
 			Collections.sort(categories, new MySorter(intCategory));
@@ -256,9 +265,9 @@ public class FlowerPower {
 		}
 		// if(calculateOrdering)
 
-		System.out.println("optimal ordering found");
-		System.out.println(java.util.Arrays.toString(optimalordering.toArray()));
-		System.out.println("avg pairwise jaccard score=" + scoremin);
+		log().info("optimal ordering found");
+		log().info(java.util.Arrays.toString(optimalordering.toArray()));
+		
 		return optimalordering;
 	}
 
@@ -305,31 +314,23 @@ public class FlowerPower {
 	}
 
 	public void computeMILists() {
-		System.out.println("Get MI lists");
+		log().info("Compute MI lists with representative topics");
 		newInst = new InstanceList(loadedinstances.getPipe());
 		mic = new MICategoryCal(DocsMap, model, loadedinstances, labels, idCatCount);
 		categoryRepMap = new HashMap<String, ArrayList<TopicLink>>();
 
-		if (false && nr_topics_for_instance != null) {
-			for (int i = 0; i < loadedinstances.size(); i++) {
-				double[] distribution = model.getInferencer().getSampledDistribution(loadedinstances.get(i), 100, 2,
-						15);
-				int[] highest = getHighestIndexes(distribution, nr_topics_for_instance);
-				clustered.put(instansids.get(i), highest);
-			}
-		}
 
 		for (int i : intCategory.keySet()) {
-			System.out.println();
+			log().info("");
 
 			mic.computePositiveAndNegativeMIvalues(i, numtopics, (InstanceList) newInst.clone());
 			ArrayList<de.l3s.algorithm.mutualinformation.MICategoryCal.TermMI> temp = mic.getCategoryRepresentativesMap().get("" + i);
-			System.out.println();
-			System.out.println(intCategory.get(i) + "(" + i + ")");
+			log().info("");
+			log().info(intCategory.get(i) + "(" + i + ")");
 			ArrayList<TopicLink> t2 = new ArrayList<TopicLink>();
 
 			for (de.l3s.algorithm.mutualinformation.MICategoryCal.TermMI t : temp) {
-				System.out.print(labels.get(t.term) + "(" + t.term + "), ");
+				log().info(labels.get(t.term) + "(" + t.term + "), ");
 				TopicLink tl = new TopicLink();
 				tl.setTid(Integer.parseInt(t.term));
 				tl.setScore(t.value);
@@ -338,13 +339,13 @@ public class FlowerPower {
 
 			categoryRepMap.put("" + i, t2);
 			// categoryScoresMap.put(""+i,scores );
-			System.out.println();
+			log().info("");
 		}
 
 	}
 
 	public void computeMIPairLists() {
-		System.out.println("Pair wise representatives- most representative terms for combined categories");
+		log().info("Pair wise representatives- most representative terms for combined categories");
 		combiningTopics = new HashMap<String, ArrayList<TopicLink>>();
 		for (int k = 0; k < catarray.length; k++) {
 			Integer i = catarray[k];
@@ -360,18 +361,18 @@ public class FlowerPower {
 			// MICategoryCal mic= new
 			// MICategoryCal(DocsMap,model,loadedinstances);
 			mic.computeValuesPairs(i, j, numtopics, (InstanceList) newInst.clone());
-			System.out.println("" + intCategory.get(i) + "-" + intCategory.get(j));
+			log().info("" + intCategory.get(i) + "-" + intCategory.get(j));
 
 			ArrayList<de.l3s.algorithm.mutualinformation.MICategoryCal.TermMI> temp = mic.getCategoryRepresentativesMap().get("" + i + "-" + j);
 			ArrayList<TopicLink> temp2 = new ArrayList<TopicLink>();
 			for (de.l3s.algorithm.mutualinformation.MICategoryCal.TermMI term : temp) {
-				System.out.print(labels.get(term.term) + ", ");
+				log().info(labels.get(term.term) + ", ");
 				TopicLink tl = new TopicLink();
 				tl.setTid(Integer.parseInt(term.term));
 				tl.setScore(term.value);
 				temp2.add(tl);
 			}
-			System.out.println();
+			log().info("");
 			combiningTopics.put("" + i + "-" + j, temp2);
 		}
 
@@ -392,12 +393,12 @@ public class FlowerPower {
 	public List<TopicLink> computeTop5() {
 		List<TopicLink> ret = new ArrayList<TopicLink>();
 		mic.centreCalculationDiversity();// New method with evenness index
-		System.out.println("Top 5 most probable topics in corpus");
+		log().info("Top 5 most probable topics in corpus");
 
 		top5 = new ArrayList<String>();
 		top5link = new ArrayList<Integer>();
 		for (int k : mic.getTop5()) {
-			System.out.print(labels.get("" + k) + ", ");
+			log().info(labels.get("" + k) + ", ");
 			top5.add(labels.get("" + k));
 			top5link.add(k);
 		}
@@ -421,12 +422,12 @@ public class FlowerPower {
 	public List<TopicLink> computeTopN(int n) {
 		List<TopicLink> ret = new ArrayList<TopicLink>();
 		mic.centreCalculationDiversity();// New method with evenness index
-		System.out.println("Top 5 most probable topics in corpus");
+		log().info("Top 5 most probable topics in corpus");
 
 		top5 = new ArrayList<String>();
 		top5link = new ArrayList<Integer>();
 		for (int k : mic.getTop5()) {
-			System.out.print(labels.get("" + k) + ", ");
+			log().info(labels.get("" + k) + ", ");
 			top5.add(labels.get("" + k));
 			top5link.add(k);
 		}
@@ -458,10 +459,10 @@ public class FlowerPower {
 
 	public InstanceList fetchFromDB(InstanceList instances, DataSource dataset, boolean onlyinstances)
 			throws FlowerException {
-
+		int cnt=0;
 		try {
 			dataset.connect();
-			System.out.println("Loading docs into instances");
+			log().info("Loading docs into instances");
 
 			while (dataset.hasNext()) {
 				DataRow rs = dataset.getRow();
@@ -469,7 +470,7 @@ public class FlowerPower {
 				text=removeStoppWords(text);
 				if (text == "" || numOfWords(text) < 2)
 					continue;
-				
+				cnt++;
 				String key = rs.getCategory();
 				String[] categories = key.trim().split(",");
 
@@ -500,7 +501,7 @@ public class FlowerPower {
 				}
 
 			}
-			// System.out.println(comp+","+rec+","+talk);
+			// log().info(comp+","+rec+","+talk);
 		} catch (UnsupportedEncodingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -523,14 +524,17 @@ public class FlowerPower {
 		}
 
 		if (!onlyinstances) {
-			System.out.println("Categories: " + docMap.keySet().size());
+			log().info("Categories: " + docMap.keySet().size());
 			int c = 0;
 			for (String s : docMap.keySet()) {
 				categoryInt.put(s, c);
 				intCategory.put(c, s);
 				c++;
-				System.out.println(s + " docs:" + docMap.get(s).size());
+				log().info(s + " docs:" + docMap.get(s).size());
 			}
+		}else
+		{
+			log().info("Background docs:" + cnt);
 		}
 		return instances;
 
@@ -590,15 +594,15 @@ public class FlowerPower {
 				tt.setScore(ts.getWeight());
 				t.getTerm().add(tt);
 			}
-			// System.out.println(topic+": "+topicDistribution[topic]+"
+			// log().info(topic+": "+topicDistribution[topic]+"
 			// "+content);
 			t.setLable(content);
 			labels.put("" + topic, content);
-			System.out.println(content);
+			log().info(content);
 
 		}
 
-		System.out.println("Done");
+		log().info("Done");
 		// labels=
 		// readLabelsFromFile("C:\\Users\\singh\\Desktop\\newsmodel"+numTopics+"labelset.txt");
 		return ret;
@@ -633,7 +637,7 @@ public class FlowerPower {
 
 		// loadedinstances=instances;
 
-		System.out.println("serializing for future use");
+		log().info("serializing for future use");
 
 		if (usemodel && modeloutputfile != null) {
 
@@ -671,7 +675,7 @@ public class FlowerPower {
 
 		try {
 			DataSource dataset = new DataSource(inputdir);
-			System.out.println("Loading docs into instances");
+			log().info("Loading docs into instances");
 
 			while (dataset.hasNext()) {
 				DataRow rs = dataset.getRow();
@@ -708,7 +712,7 @@ public class FlowerPower {
 				}
 
 			}
-			// System.out.println(comp+","+rec+","+talk);
+			// log().info(comp+","+rec+","+talk);
 		} catch (UnsupportedEncodingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -731,13 +735,13 @@ public class FlowerPower {
 		}
 
 		if (!onlyinstances) {
-			System.out.println("Categories: " + docMap.keySet().size());
+			log().info("Categories: " + docMap.keySet().size());
 			int c = 0;
 			for (String s : docMap.keySet()) {
 				categoryInt.put(s, c);
 				intCategory.put(c, s);
 				c++;
-				System.out.println(s + " docs:" + docMap.get(s).size());
+				log().info(s + " docs:" + docMap.get(s).size());
 			}
 		}
 		return instances;
@@ -781,7 +785,7 @@ public class FlowerPower {
 		try {
 			result = (ArrayList<DocMI>) docMap.get(conf).subList(0, limit);
 		} catch (Exception e) {
-			System.out.println("limit!!!!");
+			log().info("limit!!!!");
 			result = (ArrayList<DocMI>) docMap.get(conf);
 		}
 
@@ -930,16 +934,16 @@ public class FlowerPower {
 		JaccardSimilarityComparator similarityComparator = new JaccardSimilarityComparator();
 
 		AllPairsDJ dj1 = new AllPairsDJ(collection, error, confidentiality, similarityComparator);
-		System.out.println("RDJ:" + dj1.getRDJ());
+		log().info("RDJ:" + dj1.getRDJ());
 
 		// Diversity dj2 = new SampleDJ(collection, error,
 		// confidentiality,similarityComparator);
-		// System.out.println("RDJ:" + dj2.getRDJ());
+		// log().info("RDJ:" + dj2.getRDJ());
 
 		// TracjDJ works only with Jaccard similarity measure.
 		// Diversity dj3 = new TrackDJ(collection, confidentiality,
 		// confidentiality);
-		// System.out.println("RDJ:" + dj3.getRDJ());
+		// log().info("RDJ:" + dj3.getRDJ());
 		return dj1.getRDJ();
 	}
 
@@ -964,16 +968,16 @@ public class FlowerPower {
 		JaccardSimilarityComparator similarityComparator = new JaccardSimilarityComparator();
 
 		AllPairsDJ dj1 = new AllPairsDJ(collection, error, confidentiality, similarityComparator);
-		System.out.println("RDJ:" + dj1.getRDJ());
+		log().info("RDJ:" + dj1.getRDJ());
 
 		// Diversity dj2 = new SampleDJ(collection, error,
 		// confidentiality,similarityComparator);
-		// System.out.println("RDJ:" + dj2.getRDJ());
+		// log().info("RDJ:" + dj2.getRDJ());
 
 		// TracjDJ works only with Jaccard similarity measure.
 		// Diversity dj3 = new TrackDJ(collection, confidentiality,
 		// confidentiality);
-		// System.out.println("RDJ:" + dj3.getRDJ());
+		// log().info("RDJ:" + dj3.getRDJ());
 		return dj1.getRDJ();
 	}
 
@@ -1058,7 +1062,7 @@ public class FlowerPower {
 			while ((line = br.readLine()) != null) {
 				if (line.equals(""))
 					continue;
-				System.out.println(line);
+log().info(line);
 				String[] labelvalue_pair = line.split("\\t");
 				labels.put(labelvalue_pair[0], labelvalue_pair[1]);
 			}

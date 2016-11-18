@@ -32,55 +32,61 @@ public class StatisticsAnalysis {
 	private File indir;
 	private double tradeoff;
 	private int k;
-	
+	private boolean details;
+
 	public StatisticsAnalysis(String[] args) {
 		options = new Options();
 		// add t option
 
 		options.addOption(Option.builder().longOpt("indir").hasArg(false).desc("a directory to read").numberOfArgs(1)
 				.argName("path").required().build());
-		
+
 		options.addOption(Option.builder().longOpt("tradeoff").hasArg(true)
-				.desc("a parameter between [0,1]. 0 - prefer high term frequency, 1-prefer even distribution among categories. Default value: 0.01 ").required()
-				.build());
-		options.addOption(Option.builder().longOpt("k").hasArg(true)
-				.desc("The length of the stoppword candidate list").required()
-				.build());
+				.desc("a parameter between [0,1]. 0 - prefers high document frequency, 1 - prefers even distribution of the term among the ategories. Default value: 0.01 ")
+				.required().build());
+		options.addOption(Option.builder().longOpt("k").hasArg(true).desc("The length of the stoppword candidate list")
+				.required().build());
+
+		options.addOption(Option.builder().longOpt("details").hasArg(false)
+				.desc("print a score table instead of a simple list").required(false).build());
+
 		DefaultParser parser = new DefaultParser();
 		try {
 			CommandLine cmd = parser.parse(options, args);
 
-		String indirstr = cmd.getOptionValue("indir");
-		 indir=new File(indirstr);
-		 
+			details = cmd.hasOption("details");
+
+			String indirstr = cmd.getOptionValue("indir");
+			indir = new File(indirstr);
+
 			String tradeoffstr = cmd.getOptionValue("tradeoff");
-			tradeoff=0.005;
-			try{
-			 tradeoff=Double.parseDouble(tradeoffstr);
-			 if(tradeoff<0||tradeoff>1){throw new ParseException("The argument --tradeoff requires a real number [0,1] as argument");}
-			}catch(Exception e)
-			{
+			tradeoff = 0.005;
+			try {
+				tradeoff = Double.parseDouble(tradeoffstr);
+				if (tradeoff < 0 || tradeoff > 1) {
+					throw new ParseException("The argument --tradeoff requires a real number [0,1] as argument");
+				}
+			} catch (Exception e) {
 				throw new ParseException("The argument --tradeoff requires a real number [0,1] as argument");
 			}
 			String kstr = cmd.getOptionValue("k");
-			try{
-				 k=Integer.parseInt(kstr);
-				}catch(Exception e)
-				{
-					throw new ParseException("The argument --k requires to be an integer");
-				}
-			
-		} catch (ParseException e) {
-					// TODO Auto-generated catch block
+			try {
+				k = Integer.parseInt(kstr);
+			} catch (Exception e) {
+				throw new ParseException("The argument --k has to be an integer, not '"+kstr+"'");
+			}
 
-					HelpFormatter formatter = new HelpFormatter();
-					System.err.println(e.getMessage());
-					formatter.printHelp("java -cp "+Tool.jarName(this)+" " + this.getClass().getCanonicalName().trim() + " [OPTIONS]",
-							options);
-					System.exit(1);
-				}
-		
-		
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+
+			HelpFormatter formatter = new HelpFormatter();
+			System.err.println(e.getMessage());
+			formatter.printHelp(
+					"java -cp " + Tool.jarName(this) + " " + this.getClass().getCanonicalName().trim() + " [OPTIONS]",
+					options);
+			System.exit(1);
+		}
+
 	}
 
 	Hashtable<String, Hashtable<String, Integer>> statistics = new Hashtable<>();
@@ -137,77 +143,76 @@ public class StatisticsAnalysis {
 	}
 
 	public static void main(String[] args) {
-		
-		if(args.length==1&&args[0].equals("--test")){
-		String argstr = "--indir /media/zerr/BA0E0E3E0E0DF3E3/yaktextscleaned/regions/ --tradeoff 0.01 --k 100";
-		args=argstr.split("\\s+");
+
+		if (args.length == 1 && args[0].equals("--test")) {
+			String argstr = "--indir /media/zerr/BA0E0E3E0E0DF3E3/yaktextscleaned/regions/ --tradeoff 0.01 --k 100";
+			args = argstr.split("\\s+");
 		}
 		StatisticsAnalysis a = new StatisticsAnalysis(args);
-		
+
 		a.printTopK();
-		//a.doeExperiment();
-		
+		// a.doeExperiment();
+
 	}
 
 	private void printTopK() {
 		run(indir);
-		printTopK(k, this.tradeoff,calculateStats());
-		
+		printTopK(k, this.tradeoff, calculateStats());
+
 	}
 
 	private void printTopK(int k, double tradeoff, Hashtable<String, ArrayList<Double>> stats) {
-		
-		Hashtable<String, Double> scores=new Hashtable<>();
-		
-		for(String term:stats.keySet())
-		{
+
+		Hashtable<String, Double> scores = new Hashtable<>();
+
+		for (String term : stats.keySet()) {
 			ArrayList<Double> arr = stats.get(term);
 			Double df = arr.get(0);
 			Double cos = arr.get(1);
 			scores.put(term, tradeoff * Math.log(df) + (1 - tradeoff) * cos);
 		}
-		
-		
+
 		ArrayList<String> allterms = new ArrayList<>();
 		allterms.addAll(scores.keySet());
 
-		Collections.sort(allterms, new Comparator<String>(){
+		Collections.sort(allterms, new Comparator<String>() {
 
 			@Override
 			public int compare(String o1, String o2) {
 				// TODO Auto-generated method stub
 				return scores.get(o1).compareTo(scores.get(o2));
-			}});
+			}
+		});
 
 		Collections.reverse(allterms);
 		int head = 0;
 		int cnt = 0;
 
-		System.out.println("Rank\tTradeoff\tterm\tScore\tDF\tEveness");
+		if (details) {
+			System.out.println("Rank\tTradeoff\tterm\tScore\tDF\tEveness");
 
-		for (String term : allterms) {
-			if (head % 20 == 0) {
-				// System.out.println("rank\tterm\tScore\toverallcnt");
+			for (String term : allterms) {
+				if (head % 20 == 0) {
+					// System.out.println("rank\tterm\tScore\toverallcnt");
+				}
+				System.out.println(cnt++ + "\t" + tradeoff + "\t" + term + "\t" + scores.get(term) + "\t"
+						+ stats.get(term).get(0) + "\t" + stats.get(term).get(1));
+				if (head++ > k) {
+					break;
+				}
 			}
-			System.out.println(cnt++ + "\t" + tradeoff + "\t" + term + "\t" + scores.get(term) + "\t"
-					+ stats.get(term).get(0)+ "\t" +stats.get(term).get(1));
-			if (head++ > k) {
-				break;
-			}
+		}else
+		{
+			System.out.println(allterms.subList(0, k));
 		}
 
 	}
 
-	Hashtable<String, ArrayList<Double>> calculateStats()
-	{
+	Hashtable<String, ArrayList<Double>> calculateStats() {
 
-		Hashtable<String, ArrayList<Double>> scores=new Hashtable<>();
-		
-	
+		Hashtable<String, ArrayList<Double>> scores = new Hashtable<>();
 
 		HashSet<String> visited = new HashSet<>();
-
-
 
 		Hashtable<String, List<Double>> requencydistribution = new Hashtable<>();
 
@@ -261,7 +266,8 @@ public class StatisticsAnalysis {
 				}
 				double avg = sumdf / frequencies.size() / (allcnt / statistics.size());
 
-				scores.put(term, new ArrayList<Double>(Arrays.asList(new Double[]{avg, Math.abs(cosineSimilarity(values, new double[] { 300, 300, 300, 300 }))})));
+				scores.put(term, new ArrayList<Double>(Arrays.asList(new Double[] { avg,
+						Math.abs(cosineSimilarity(values, new double[] { 300, 300, 300, 300 })) })));
 			}
 
 		}
@@ -269,17 +275,16 @@ public class StatisticsAnalysis {
 		return scores;
 
 	}
-		
-	
+
 	private void doeExperiment() {
 		run(indir);
 		Hashtable<String, ArrayList<Double>> list = calculateStats();
-	
+
 		Hashtable<Double, Integer> ranks = new Hashtable<>();
 		ArrayList<String> allterms = new ArrayList<>();
 		allterms.addAll(list.keySet());
 
-		for (Double factor=0.001;factor<0.5;factor+=0.001) {
+		for (Double factor = 0.001; factor < 0.5; factor += 0.001) {
 			Hashtable<String, Double> scores = new Hashtable<>();
 			for (String s : allterms) {
 				Double avg = list.get(s).get(0);
@@ -296,7 +301,7 @@ public class StatisticsAnalysis {
 			});
 
 			Collections.reverse(allterms);
-			
+
 			HashSet<String> set = getStopwords();
 			int cnt = set.size();
 			for (int i = 0; i < 200; i++) {
@@ -309,24 +314,22 @@ public class StatisticsAnalysis {
 				}
 			}
 		}
-ArrayList<Double> rankvals=new ArrayList<>(ranks.keySet());
-Collections.sort(rankvals,new Comparator<Double>() {
+		ArrayList<Double> rankvals = new ArrayList<>(ranks.keySet());
+		Collections.sort(rankvals, new Comparator<Double>() {
 
-	@Override
-	public int compare(Double o1, Double o2) {
-		// TODO Auto-generated method stub
-		return ranks.get(o1).compareTo(ranks.get(o2));
+			@Override
+			public int compare(Double o1, Double o2) {
+				// TODO Auto-generated method stub
+				return ranks.get(o1).compareTo(ranks.get(o2));
+			}
+
+		});
+
+		for (Double d : rankvals) {
+			System.out.println(d + "\t" + ranks.get(d));
+		}
+
 	}
-	
-});
-
-for(Double d:rankvals){
-		System.out.println(d+"\t"+ranks.get(d));
-}
-
-	}
-
-
 
 	public static double cosineSimilarity(double[] vectorA, double[] vectorB) {
 		double dotProduct = 0.0;

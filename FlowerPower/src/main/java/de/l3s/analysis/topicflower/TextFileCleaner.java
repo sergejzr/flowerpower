@@ -70,8 +70,7 @@ public class TextFileCleaner {
 			indir = cmd.getOptionValue("indir");
 			outdir = cmd.getOptionValue("outdir");
 
-			String infile = cmd.getOptionValue("infile");
-			String outfile = cmd.getOptionValue("outfile");
+
 			 lang = cmd.getOptionValue("lang", "en");
 			 numthreads = 1;
 			String numthreadsstr = cmd.getOptionValue("numthreads", "1");
@@ -101,7 +100,11 @@ public class TextFileCleaner {
 				throw new ParseException("argument" + stopliststr + " is not correct for the option --stoplist");
 			}
 
-		
+		if(indir.equals(outdir))
+		{
+			throw new ParseException("--outdir cannot be the same as --indir");
+			
+		}
 
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
