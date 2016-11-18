@@ -93,7 +93,7 @@ public class StatisticsAnalysis {
 				@Override
 				public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
 
-					if (attrs.isDirectory() || !file.toString().endsWith("tsv_TMP")) {
+					if (attrs.isDirectory() || !file.toString().endsWith("txt")) {
 						return FileVisitResult.CONTINUE;
 					}
 					if (file.getParent().endsWith("misc")) {

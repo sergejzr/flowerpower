@@ -321,6 +321,7 @@ public class TopicFlowerCreator {
 				+ "--ldamodelfile tmp/model.mdl --structureoutput tmp/flower.xml "
 				+ "--petalorder natural --tcenter 5:5 --tconnect 3:3 --tpetal 4:4 --format png --floweroutput test.png";
 
+		 arguments="--inputdir /media/zerr/BA0E0E3E0E0DF3E3/yaktextscleaned/regions/ --background /media/zerr/BA0E0E3E0E0DF3E3/yaktextscleaned/misc/ --stoppwords actually,kind,also,get,haha,have,here,just,lol,not,only,out,still,that,then,there,too,well,yak,yeah,yik  --k 200 --ldathreadnum 1 --iternum 500 --top 5 --ldamodelfile tmp/model.mdl --structureoutput tmp/flower.xml --petalorder natural --tcenter 5:5 --tconnect 3:3 --tpetal 4:4 --format png --floweroutput tmp/flower.png";
 		args=arguments.split("\\s+");
 		}
 		try {

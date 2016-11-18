@@ -130,7 +130,7 @@ public class TextFileCleaner {
 				@Override
 				public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
 
-					if (attrs.isDirectory() || !file.toString().endsWith("tsv")) {
+					if (attrs.isDirectory() || !file.toString().endsWith("txt")) {
 						return FileVisitResult.CONTINUE;
 					}
 
@@ -138,7 +138,7 @@ public class TextFileCleaner {
 					Path newpath = outpath.resolve(rel);
 					newpath.toFile().getParentFile().mkdirs();
 					
-					File targetfile = new File(newpath.toFile().toString()+"_TMP");
+					File targetfile = new File(newpath.toFile().toString());
 					if(targetfile.exists()){return FileVisitResult.CONTINUE;}
 					lemmatizeParallel(file.toFile(), targetfile);
 					return FileVisitResult.CONTINUE;
