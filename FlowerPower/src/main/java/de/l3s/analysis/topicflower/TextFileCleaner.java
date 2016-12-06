@@ -179,7 +179,7 @@ System.out.println("Preprocessing done");
 
 				ExecutorService executor = Executors.newFixedThreadPool(numthreads);
 
-				int batchsize = 100;
+				int batchsize = 1000;
 				while (batchsize-- > 0 && (line = br.readLine()) != null) {
 
 					origidx.put(id, line);
@@ -236,7 +236,7 @@ System.out.println("Preprocessing done");
 		
 		if(args.length==1&&args[0].equals("--test")){
 		{
-			args=("--indir /media/zerr/BA0E0E3E0E0DF3E3/yak/yaktexts/ --outdir /media/zerr/BA0E0E3E0E0DF3E3/yak/yakcleantextx "
+			args=("--indir /media/zerr/BA0E0E3E0E0DF3E3/brexittweets/textanalysis/ --outdir /media/zerr/BA0E0E3E0E0DF3E3/brexittweets/cleantextanalysis/ "
 					+ "--numthreads 30").split("\\s+");
 		}
 		}
