@@ -41,6 +41,8 @@ public class TextFileCleaner {
 	private String outdir;
 	private String lang;
 	private String[] poslist;
+	private int batchsize;
+	private int maxdocs;
 
 	
 
@@ -61,6 +63,13 @@ public class TextFileCleaner {
 				Option.builder().longOpt("pos").hasArg(true).desc("comma separated list of part of speech tags to keep")
 						.numberOfArgs(1).argName("poslist").valueSeparator(',').required(false).build());
 		options.addOption(
+				Option.builder().longOpt("batchsize").hasArg(true).desc("number of documents handled by a single thread")
+						.required(false).build());
+		options.addOption(
+				Option.builder().longOpt("maxdocs").hasArg(true).desc("maximum number of documents to consider per file")
+						.required(false).build());
+		
+		options.addOption(
 				Option.builder().longOpt("stem").desc("true, if the words should be stemmed").required(false).build());
 		options.addOption(Option.builder().longOpt("stoplist").desc("list of stopwords").required(false).build());
 		DefaultParser parser = new DefaultParser();
@@ -78,8 +87,25 @@ public class TextFileCleaner {
 				numthreads = Integer.parseInt(numthreadsstr);
 			} catch (Exception e) {
 				throw new ParseException(
-						"argument" + numthreadsstr + " is not correct for the option --umthreads (should be integer)");
+						"argument" + numthreadsstr + " is not correct for the option --numthreads (should be integer)");
 			}
+			
+			String batchsizestr = cmd.getOptionValue("batchsize", "100");
+			try {
+				batchsize = Integer.parseInt(batchsizestr);
+			} catch (Exception e) {
+				throw new ParseException(
+						"argument" + batchsizestr + " is not correct for the option --batchsize (should be integer)");
+			}
+			
+			String maxdocsstr = cmd.getOptionValue("maxdocs", "100");
+			try {
+				maxdocs = Integer.parseInt(maxdocsstr);
+			} catch (Exception e) {
+				throw new ParseException(
+						"argument" + maxdocsstr + " is not correct for the option --maxdocs (should be integer)");
+			}
+			
 
 			String posliststr = cmd.getOptionValue("poslist", "F,J,N,R,U,V");
 		
@@ -171,6 +197,7 @@ System.out.println("Preprocessing done");
 
 			String line = null;
 			int id = 1;
+			int maxdocs = this.maxdocs;
 			do {
 
 				Hashtable<Integer, String> origidx = new Hashtable<Integer, String>();
@@ -179,18 +206,23 @@ System.out.println("Preprocessing done");
 
 				ExecutorService executor = Executors.newFixedThreadPool(numthreads);
 
-				int batchsize = 1000;
+				int batchsize = this.batchsize;
 				while (batchsize-- > 0 && (line = br.readLine()) != null) {
 
 					origidx.put(id, line);
 					towork.add(id);
 					id++;
+					if(maxdocs--<=0)
+					{
+						continue;
+					}
 				}
 
 				for (int i = 0; i < numthreads; i++) {
 					LemmatizeThread t;
 					executor.execute(t = new LemmatizeThread(origidx, towork, this.lang, poslist, stemm, stopwords));
 					myworkers.add(t);
+					
 				}
 
 				try {
@@ -237,7 +269,7 @@ System.out.println("Preprocessing done");
 		if(args.length==1&&args[0].equals("--test")){
 		{
 			args=("--indir /media/zerr/BA0E0E3E0E0DF3E3/brexittweets/textanalysis/ --outdir /media/zerr/BA0E0E3E0E0DF3E3/brexittweets/cleantextanalysis/ "
-					+ "--numthreads 30").split("\\s+");
+					+ "--numthreads 30 --maxdocs 2000 --batchsize 500").split("\\s+");
 		}
 		}
 		TextFileCleaner tc1 = new TextFileCleaner(
