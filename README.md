@@ -15,7 +15,7 @@ A very short guide (will be more detailed hopefully later):
 
   pa) not enough text / size of the corpora too small (topics make no sense)
   
-  pb) Too much overlapping information between the categories (all topics look the same)
+  pb) Too much overlapping information between the categories (same topics in different categories)
   
   pc) Too many or to little k (topic number) is selected (all topics look the same, or are too general)
   
