@@ -519,7 +519,7 @@ public class MIselection {
 		ArrayList<Terms> negativeList = new ArrayList<Terms>();
 		
 		String postexte[]=new String[]{"sea sun sand", "beach sand", "sand warm sea"};
-		String negtexte[]=new String[]{"freezw sun snow", "snow ice", "ice cold freeze"};
+		String negtexte[]=new String[]{"freeze sun snow", "snow ice", "ice cold freeze"};
 		
 		
 	addTerms(positiveList,postexte);
