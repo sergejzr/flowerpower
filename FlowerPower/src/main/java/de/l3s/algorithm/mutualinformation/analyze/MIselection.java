@@ -474,6 +474,41 @@ public class MIselection {
 		return ret;
 	}
 
+	
+	
+	public static void addTerms(ArrayList<Terms> curlist, String texte[])
+	{
+
+		ArrayList<TermPos> photo1pos = new ArrayList<TermPos>();
+
+		Vector<String> terms = new Vector<String>();
+		for(String text:texte)
+		{
+			terms.add(text);
+		}
+	
+		
+		// TODO: get your
+													// term list
+		// allfeatures.getSimpleTermList();
+
+		for (String term : terms) {
+
+			if (term.length() == 0) {
+				// System.out.println("zero found");
+				continue;
+			}
+			
+			photo1pos.add(new TermPos(term, 0));
+		}
+
+		if (photo1pos.size() > 0) {
+			Terms terms1pos = new Terms(photo1pos);
+			curlist.add(terms1pos);
+		}
+	
+	}
+	
 	/**
 	 * main-Methode zum Testen
 	 */
@@ -483,6 +518,51 @@ public class MIselection {
 		ArrayList<Terms> positiveList = new ArrayList<Terms>();
 		ArrayList<Terms> negativeList = new ArrayList<Terms>();
 		
+		String postexte[]=new String[]{"sea sun sand", "beach sand", "sand warm sea"};
+		String negtexte[]=new String[]{"freezw sun snow", "snow ice", "ice cold freeze"};
+		
+		
+	addTerms(positiveList,postexte);
+	addTerms(negativeList,negtexte);
+	
+		
+		
+		MIselection mi = new MIselection(positiveList, negativeList);
+		
+		mi.computePositiveAndNegativeMIvalues();
+		
+		/*
+		System.out.println("mi.getTopNposResults() "
+				+ mi.getTopNposResultList());
+		System.out.println("mi.getTopNnegResults() "
+				+ mi.getTopNnegResultList());
+		
+		ArrayList temp = mi.getTopNposResultList();
+		Collections.reverse(temp);
+		ArrayList temp2 = mi.getTopNnegResultList();
+		Collections.reverse(temp2);
+		System.out.println("rev mi.getTopNposResults() "
+				+temp) ;
+		System.out.println("rev mi.getTopNnegResults() "
+				+ temp2);
+		
+		*/
+		
+			
+			String posTopic="summer", negTopic="winter";
+			
+			System.out.println();
+		System.out.println("MI");	
+		System.out.println("mi.getTopNposResults(30) "+posTopic+":"
+				+ mi.getTopNposResultList(30));
+		
+		
+		System.out.println("mi.getTopNnegResults(30) "+negTopic+":"
+				+ mi.getTopNnegResultList(30));
+		
+		
+	
+		/*
 		int numtopics=26;
 		HashMap<String, Double> map= new HashMap<String, Double>();
 		
@@ -604,40 +684,9 @@ public class MIselection {
 		                 
 			        }
 			       
+
 					
-					MIselection mi = new MIselection(positiveList, negativeList);
-					
-					mi.computePositiveAndNegativeMIvalues();
-					
-					/*
-					System.out.println("mi.getTopNposResults() "
-							+ mi.getTopNposResultList());
-					System.out.println("mi.getTopNnegResults() "
-							+ mi.getTopNnegResultList());
-					
-					ArrayList temp = mi.getTopNposResultList();
-					Collections.reverse(temp);
-					ArrayList temp2 = mi.getTopNnegResultList();
-					Collections.reverse(temp2);
-					System.out.println("rev mi.getTopNposResults() "
-							+temp) ;
-					System.out.println("rev mi.getTopNnegResults() "
-							+ temp2);
-					
-					*/
-					
-						
-						
-						System.out.println();
-					System.out.println("MI");	
-					System.out.println("mi.getTopNposResults(30) "+posTopic+":"
-							+ mi.getTopNposResultList(30));
-					
-					
-					System.out.println("mi.getTopNnegResults(30) "+posTopic+":"
-							+ mi.getTopNnegResultList(30));
-					
-		       }
+		       }*/
 		        
 	}
 
