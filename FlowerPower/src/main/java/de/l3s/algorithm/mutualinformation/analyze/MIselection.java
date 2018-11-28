@@ -484,7 +484,7 @@ public class MIselection {
 		Vector<String> terms = new Vector<String>();
 		for(String text:texte)
 		{
-			terms.add(text);
+			terms.addAll(Arrays.asList(text.split(" ")));
 		}
 	
 		
