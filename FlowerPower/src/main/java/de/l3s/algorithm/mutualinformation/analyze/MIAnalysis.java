@@ -40,7 +40,7 @@ options.addOption(Option.builder().longOpt("indir_pos").hasArg(false).desc("path
 options.addOption(Option.builder().longOpt("lable_pos").hasArg(false).desc("positive lable").numberOfArgs(1)
 		.argName("lable1").build());
 
-options.addOption(Option.builder().longOpt("indir_neg").hasArg(false).desc("path to the directory with positive examples ").numberOfArgs(1)
+options.addOption(Option.builder().longOpt("indir_neg").hasArg(false).desc("path to the directory with nagative examples ").numberOfArgs(1)
 		.argName("path2").required().build());
 options.addOption(Option.builder().longOpt("lable_neg").hasArg(false).desc("negative lable").numberOfArgs(1)
 		.argName("lable2").build());
