@@ -14,6 +14,7 @@ import java.util.Vector;
 import org.apache.lucene.analysis.LowerCaseFilter;
 import org.apache.lucene.analysis.StopFilter;
 import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.de.GermanAnalyzer;
 import org.apache.lucene.analysis.en.EnglishAnalyzer;
 import org.apache.lucene.analysis.standard.StandardFilter;
 import org.apache.lucene.analysis.standard.StandardTokenizer;
@@ -39,7 +40,14 @@ public class LemmatizeThread implements Runnable {
 
 		this.towork = towork;
 		lem = new Lemmatizer();
-		lem.loadParser("edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz");
+		
+		if(langtoken.equals("de")){
+			lem.loadParser("edu/stanford/nlp/models/lexparser/germanPCFG.ser.gz");
+			
+		}else{
+			lem.loadParser("edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz");
+		}
+		
 		this.langtoken = langtoken;
 		this.stemm = stemm;
 		if (stopwords == null) {
@@ -162,7 +170,13 @@ public class LemmatizeThread implements Runnable {
 			result = new StandardFilter(Version.LUCENE_35, result);
 			result = new LowerCaseFilter(Version.LUCENE_35, result);
 			if (stemm) {
+				
+				if(langtoken.equals("de")){
+					result = new StopFilter(Version.LUCENE_35, result, GermanAnalyzer.getDefaultStopSet());
+				}else{
 				result = new StopFilter(Version.LUCENE_35, result, EnglishAnalyzer.getDefaultStopSet());
+				}
+				
 			}
 
 			// result = new DictionaryCompoundWordTokenFilter(Version.LUCENE_35,

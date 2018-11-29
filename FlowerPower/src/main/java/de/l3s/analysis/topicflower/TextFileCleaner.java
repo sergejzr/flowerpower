@@ -72,6 +72,14 @@ public class TextFileCleaner {
 		options.addOption(
 				Option.builder().longOpt("stem").desc("true, if the words should be stemmed").required(false).build());
 		options.addOption(Option.builder().longOpt("stoplist").desc("list of stopwords").required(false).build());
+		
+		options.addOption(
+				Option.builder().longOpt("test").hasArg(false).desc("The software will run in demo mode")
+						.build());
+		options.addOption(
+				Option.builder().longOpt("help").hasArg(false).desc("Prints possible options")
+						.build());
+		
 		DefaultParser parser = new DefaultParser();
 		try {
 			CommandLine cmd = parser.parse(options, args);
@@ -131,6 +139,19 @@ public class TextFileCleaner {
 			throw new ParseException("--outdir cannot be the same as --indir");
 			
 		}
+		
+		if(!new File(indir).exists())
+		{
+			throw new ParseException("Error: --indir "+indir+" does not exist");
+			
+		}
+		
+		if(!new File(outdir).exists())
+		{
+			throw new ParseException("Error: --indir "+outdir+" does not exist");
+			
+		}
+		
 
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
@@ -268,8 +289,12 @@ System.out.println("Preprocessing done");
 		
 		if(args.length==1&&args[0].equals("--test")){
 		{
-			args=("--indir /media/zerr/BA0E0E3E0E0DF3E3/brexittweets/textanalysis/ --outdir /media/zerr/BA0E0E3E0E0DF3E3/brexittweets/cleantextanalysis/ "
-					+ "--numthreads 30 --maxdocs 2000 --batchsize 500").split("\\s+");
+			String argumentline="--indir testtweets/ --lang de --numthreads 4 --outdir testtweetsclean/ --stem"
+					;
+			System.out.println("DEMO mode.\n"+argumentline+"\n");
+			args=(argumentline).split("\\s+");
+			
+
 		}
 		}
 		TextFileCleaner tc1 = new TextFileCleaner(
