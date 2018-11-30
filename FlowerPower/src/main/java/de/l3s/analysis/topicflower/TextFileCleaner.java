@@ -146,11 +146,7 @@ public class TextFileCleaner {
 			
 		}
 		
-		if(!new File(outdir).exists())
-		{
-			throw new ParseException("Error: --indir "+outdir+" does not exist");
-			
-		}
+
 		
 
 		} catch (ParseException e) {
