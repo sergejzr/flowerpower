@@ -145,7 +145,7 @@ public class TextFileCleaner {
 			throw new ParseException("Error: --indir "+indir+" does not exist");
 			
 		}
-		
+		new File(outdir).mkdirs();
 
 		
 
