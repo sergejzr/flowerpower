@@ -40,20 +40,20 @@ public class LemmatizeThread implements Runnable {
 
 		this.towork = towork;
 		lem = new Lemmatizer();
-		
-		if(langtoken.equals("de")){
+
+		if (langtoken.equals("de")) {
 			lem.loadParser("edu/stanford/nlp/models/lexparser/germanPCFG.ser.gz");
-			
-		}else{
+
+		} else {
 			lem.loadParser("edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz");
 		}
-		
+
 		this.langtoken = langtoken;
 		this.stemm = stemm;
 		if (stopwords == null) {
 			this.stopwords = null;
 		} else {
-			this.stopwords=new HashSet<>();
+			this.stopwords = new HashSet<>();
 			this.stopwords.addAll(Arrays.asList(stopwords));
 		}
 	}
@@ -103,12 +103,15 @@ public class LemmatizeThread implements Runnable {
 					System.out.println("lemmatizedidx=null");
 				}
 			}
-
-			String lemmatized = getNouns(txt, lem, langtoken);
-			if (lemmatized == null) {
-				System.out.println("lemmatized=null");
+			try {
+				String lemmatized = getNouns(txt, lem, langtoken);
+				if (lemmatized == null) {
+					System.out.println("lemmatized=null");
+				}
+				lemmatizedidx.put(task, lemmatized);
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
-			lemmatizedidx.put(task, lemmatized);
 
 		}
 
@@ -117,17 +120,14 @@ public class LemmatizeThread implements Runnable {
 	String getNouns(String s, de.l3s.nlp.Lemmatizer mylem, String langtoken) {
 
 		StringBuilder sb = new StringBuilder();
-		
-		ArrayList<Lemma> res=new ArrayList<>();
-		for(String st:s.split("\\."))
-		{
+
+		ArrayList<Lemma> res = new ArrayList<>();
+		for (String st : s.split("\\.")) {
 			Vector<Lemma> res2 = mylem.getLemma(st, langtoken);
-			if(res2!=null)
-			{
+			if (res2 != null) {
 				res.addAll(res2);
 			}
 		}
-		
 
 		if (res.isEmpty())
 			return "";
@@ -170,13 +170,13 @@ public class LemmatizeThread implements Runnable {
 			result = new StandardFilter(Version.LUCENE_35, result);
 			result = new LowerCaseFilter(Version.LUCENE_35, result);
 			if (stemm) {
-				
-				if(langtoken.equals("de")){
+
+				if (langtoken.equals("de")) {
 					result = new StopFilter(Version.LUCENE_35, result, GermanAnalyzer.getDefaultStopSet());
-				}else{
-				result = new StopFilter(Version.LUCENE_35, result, EnglishAnalyzer.getDefaultStopSet());
+				} else {
+					result = new StopFilter(Version.LUCENE_35, result, EnglishAnalyzer.getDefaultStopSet());
 				}
-				
+
 			}
 
 			// result = new DictionaryCompoundWordTokenFilter(Version.LUCENE_35,
