@@ -34,7 +34,7 @@ File curfile=null;
 			return false;
 		}
 		try {
-			scan = new Scanner(curfile=it.next());
+			scan = new Scanner(curfile=it.next(), "UTF-8");
 			return hasNext();
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
