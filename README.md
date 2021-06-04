@@ -1,4 +1,6 @@
 # flowerpower
+The Software was created and used in the paper: Jaspreet Singh, Sergej Zerr, and Stefan Siersdorfer. 2017. Structure-Aware Visualization of Text Corpora. In Proceedings of the 2017 Conference on Conference Human Information Interaction and Retrieval (CHIIR '17).
+
 
 A very short guide (will be more detailed hopefully later):
 
